@@ -1,9 +1,11 @@
 import { Tabs } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { useTranslation } from 'react-i18next';
 
 export default function TabLayout() {
   const { theme, colors } = useAppTheme();
+  const { t } = useTranslation();
 
   return (
     <Tabs
@@ -20,28 +22,28 @@ export default function TabLayout() {
       <Tabs.Screen
         name="favourites"
         options={{
-          title: 'Favoriler',
+          title: t('tabs.favourites'),
           tabBarIcon: ({ color }) => <Feather name="heart" size={22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Keşfet',
+          title: t('tabs.explore'),
           tabBarIcon: ({ color }) => <Feather name="search" size={22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="appointments"
         options={{
-          title: 'Randevularım',
+          title: t('tabs.appointments'),
           tabBarIcon: ({ color }) => <Feather name="calendar" size={22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profil',
+          title: t('tabs.profile'),
           tabBarIcon: ({ color }) => <Feather name="user" size={22} color={color} />,
         }}
       />

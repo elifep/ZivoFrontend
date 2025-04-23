@@ -1,0 +1,27 @@
+{
+    "home": {
+        "title": "Ana Sayfa",
+        "greeting": "Hoş geldin {{name}}!"
+    },
+    "profile": {
+        "title": "Profilim",
+        "language": "Dil Seç"
+    },
+    "tabs": {
+        "favourites": "Favoriler",
+        "explore": "Keşfet",
+        "appointments": "Randevularım",
+        "profile": "Profil"
+      },
+      "favourites": {
+        "title": "Favori Salonlarım"
+      },
+      "appointments": {
+        "employee": "Çalışan"
+      },
+      "buttons": {
+        "edit": "Düzenle",
+        "cancel": "İptal Et",
+        "save": "Kaydet"
+      }        
+}
