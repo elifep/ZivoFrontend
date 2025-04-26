@@ -12,10 +12,11 @@ export default function TabLayout() {
       key={theme}
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
+        tabBarActiveTintColor: '#fff',
+        tabBarInactiveTintColor: '#999',
         tabBarStyle: {
-          backgroundColor: colors.background,
-          borderTopColor: colors.card,
+          backgroundColor: '#000',
+          borderTopColor: '#000',
         },
       }}
     >

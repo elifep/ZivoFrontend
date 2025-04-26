@@ -13,8 +13,8 @@ export default function ExploreHeader({ selected, onSelect }: Props) {
     const { colors } = useAppTheme();
 
     return (
-        <SafeAreaView style={{ backgroundColor: colors.background }}>
-            <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <SafeAreaView style={{ backgroundColor: '#000' }}>
+            <View style={[styles.container, { backgroundColor: '#000' }]}>
                 {/* Arama Kutusu */}
                 <View style={[styles.searchBox, { backgroundColor: colors.searchBackground }]}>
                     <Feather name="search" size={18} color={colors.icon} style={{ marginRight: 8 }} />
@@ -46,12 +46,12 @@ export default function ExploreHeader({ selected, onSelect }: Props) {
                             onPress={() => onSelect(cat)}
                             style={[
                                 styles.tab,
-                                selected === cat && { borderBottomColor: colors.primary, borderBottomWidth: 2 },
+                                selected === cat && { borderBottomColor: '#fff', borderBottomWidth: 2 },
                             ]}
                         >
                             <Text
                                 style={{
-                                    color: selected === cat ? colors.primary : colors.text,
+                                    color: selected === cat ? '#fff' : '#ccc',
                                     fontWeight: selected === cat ? 'bold' : '500',
                                 }}
                             >
