@@ -1,104 +1,282 @@
-import { View, Text, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Platform, Image } from 'react-native';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useTranslation } from 'react-i18next';
-import i18n from 'i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-const ThemeOptions = ['light', 'dark'] as const;
+import { useState, Dispatch, SetStateAction } from 'react';
+import ThemePicker from '@/components/ThemePicker';
+import LanguagePicker from '@/components/LanguagePicker';
+import DropDownPicker from 'react-native-dropdown-picker';
+import { mockProfile } from '@/data/profile';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { format } from 'date-fns';
 
 export default function ProfileScreen() {
+    const { colors, theme } = useAppTheme();
     const { t } = useTranslation();
-    const { theme, setTheme, colors } = useAppTheme();
 
-    const changeLanguage = (lang: 'tr' | 'en') => {
-        i18n.changeLanguage(lang);
-    };
+    const [profile, setProfile] = useState(mockProfile);
+
+    const [cityOpen, setCityOpen] = useState(false);
+    const [countryOpen, setCountryOpen] = useState(false);
+    const [genderOpen, setGenderOpen] = useState(false);
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-            <View style={styles.inner}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+            <KeyboardAwareScrollView
+                contentContainerStyle={{ paddingBottom: 40, paddingHorizontal: 20 }}
+                extraScrollHeight={100}
+                enableOnAndroid
+                keyboardShouldPersistTaps="handled"
+            >
                 {/* Başlık */}
-                <Text style={[styles.title, { color: colors.text }]}>{t('profile.title')}</Text>
+                <Text style={[styles.header, { color: colors.text }]}>
+                    {t('profile.title') || 'Profil Bilgilerim'}
+                </Text>
 
-                {/* Tema Seçimi */}
-                <Text style={[styles.label, { color: colors.icon }]}>{t('profile.theme')}</Text>
-                {ThemeOptions.map((option) => (
-                    <Pressable
-                        key={option}
-                        onPress={() => setTheme(option)}
+                {/* Profil Fotoğrafı */}
+                <View style={styles.center}>
+                    <Image source={{ uri: profile.image }} style={styles.profileImage} />
+                </View>
+
+                {/* Kart */}
+                <View style={[styles.card, { backgroundColor: colors.card }]}>
+                    <ProfileInput
+                        label="Ad Soyad"
+                        value={profile.fullName}
+                        onChangeText={(text) => setProfile({ ...profile, fullName: text })}
+                    />
+                    <ProfileInput
+                        label="E-posta"
+                        value={profile.email}
+                        onChangeText={(text) => setProfile({ ...profile, email: text })}
+                    />
+
+                    {/* Tarih Seçimi */}
+                    <Text style={[styles.label, { color: colors.icon }]}>Doğum Tarihi</Text>
+                    <TouchableOpacity
+                        onPress={() => setShowDatePicker(true)}
                         style={[
-                            styles.option,
-                            {
-                                borderColor: colors.primary,
-                                backgroundColor: theme === option ? colors.card : 'transparent',
-                            },
+                            styles.input,
+                            { backgroundColor: colors.background, borderColor: colors.border, justifyContent: 'center' },
                         ]}
                     >
-                        <Text style={[styles.optionText, { color: colors.text }]}>
-                            {option === 'light' ? 'Açık Tema' : 'Koyu Tema'}
+                        <Text style={{ color: profile.birthday ? colors.text : colors.icon }}>
+                            {profile.birthday
+                                ? format(new Date(profile.birthday), 'dd.MM.yyyy')
+                                : 'Tarih Seçin'}
                         </Text>
-                    </Pressable>
-                ))}
-
-                {/* Dil Seçimi */}
-                <Text style={[styles.label, { color: colors.icon }]}>{t('profile.language')}</Text>
-                <View style={styles.buttonRow}>
-                    <TouchableOpacity
-                        style={[styles.langBtn, { borderColor: colors.text }]}
-                        onPress={() => changeLanguage('tr')}
-                    >
-                        <Text style={{ color: colors.text }}>🇹🇷 Türkçe</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity
-                        style={[styles.langBtn, { borderColor: colors.text }]}
-                        onPress={() => changeLanguage('en')}
-                    >
-                        <Text style={{ color: colors.text }}>🇺🇸 English</Text>
-                    </TouchableOpacity>
+                    {showDatePicker && (
+                        <DateTimePicker
+                            mode="date"
+                            value={profile.birthday ? new Date(profile.birthday) : new Date()}
+                            display={Platform.OS === 'ios' ? 'spinner' : 'calendar'}
+                            onChange={(event, selectedDate) => {
+                                setShowDatePicker(false);
+                                if (selectedDate) {
+                                    setProfile({ ...profile, birthday: selectedDate.toISOString() });
+                                }
+                            }}
+                            {...(Platform.OS === 'ios' && { themeVariant: theme === 'dark' ? 'dark' : 'light' })}
+                        />
+                    )}
+
+                    <ProfileInput
+                        label="Telefon"
+                        value={profile.phone}
+                        onChangeText={(text) => setProfile({ ...profile, phone: text })}
+                    />
+                    <ProfileInput
+                        label="Adres"
+                        value={profile.address}
+                        onChangeText={(text) => setProfile({ ...profile, address: text })}
+                    />
+
+                    {/* Dropdown Alanları */}
+                    <ProfileDropdown
+                        label="Şehir"
+                        open={cityOpen}
+                        value={profile.city}
+                        items={[
+                            { label: 'İstanbul', value: 'İstanbul' },
+                            { label: 'Ankara', value: 'Ankara' },
+                            { label: 'İzmir', value: 'İzmir' },
+                        ]}
+                        setOpen={(open) => {
+                            setCityOpen(open);
+                            if (open) {
+                                setCountryOpen(false);
+                                setGenderOpen(false);
+                            }
+                        }}
+                        onChangeValue={(val) => setProfile({ ...profile, city: val })}
+                        zIndex={3000}
+                    />
+
+                    <ProfileDropdown
+                        label="Ülke"
+                        open={countryOpen}
+                        value={profile.country}
+                        items={[
+                            { label: 'Türkiye', value: 'Türkiye' },
+                            { label: 'USA', value: 'USA' },
+                            { label: 'Germany', value: 'Germany' },
+                        ]}
+                        setOpen={(open) => {
+                            setCountryOpen(open);
+                            if (open) {
+                                setCityOpen(false);
+                                setGenderOpen(false);
+                            }
+                        }}
+                        onChangeValue={(val) => setProfile({ ...profile, country: val })}
+                        zIndex={2000}
+                    />
+
+                    <ProfileDropdown
+                        label="Cinsiyet"
+                        open={genderOpen}
+                        value={profile.gender}
+                        items={[
+                            { label: 'Erkek', value: 'Erkek' },
+                            { label: 'Kadın', value: 'Kadın' },
+                            { label: 'Diğer', value: 'Diğer' },
+                        ]}
+                        setOpen={(open) => {
+                            setGenderOpen(open);
+                            if (open) {
+                                setCityOpen(false);
+                                setCountryOpen(false);
+                            }
+                        }}
+                        onChangeValue={(val) => setProfile({ ...profile, gender: val })}
+                        zIndex={1000}
+                    />
                 </View>
-            </View>
+
+                {/* Tema & Dil Seçimi */}
+                <Text style={[styles.sectionTitle, { color: colors.icon }]}>Tema Seçimi</Text>
+                <ThemePicker />
+
+                <Text style={[styles.sectionTitle, { color: colors.icon }]}>Dil Seçimi</Text>
+                <LanguagePicker />
+
+                {/* Kaydet Butonu */}
+                <TouchableOpacity style={[styles.saveButton, { borderColor: colors.primary }]}>
+                    <Text style={[styles.saveButtonText, { color: colors.primary }]}>Kaydet</Text>
+                </TouchableOpacity>
+
+            </KeyboardAwareScrollView>
         </SafeAreaView>
     );
 }
 
+// Alt Bileşenler
+function ProfileInput({ label, value, onChangeText }: { label: string; value: string; onChangeText: (text: string) => void }) {
+    const { colors } = useAppTheme();
+    return (
+        <View style={{ marginBottom: 16 }}>
+            <Text style={[styles.label, { color: colors.icon }]}>{label}</Text>
+            <TextInput
+                value={value}
+                onChangeText={onChangeText}
+                placeholder={label}
+                placeholderTextColor={colors.icon}
+                style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.background }]}
+            />
+        </View>
+    );
+}
+
+function ProfileDropdown({
+    label, open, value, items, setOpen, onChangeValue, zIndex
+}: {
+    label: string;
+    open: boolean;
+    value: string;
+    items: { label: string; value: string }[];
+    setOpen: Dispatch<SetStateAction<boolean>>;
+    onChangeValue: (val: string) => void;
+    zIndex: number;
+}) {
+    const { colors } = useAppTheme();
+    return (
+        <View style={{ marginBottom: 16, zIndex }}>
+            <Text style={[styles.label, { color: colors.icon }]}>{label}</Text>
+            <DropDownPicker
+                open={open}
+                value={value}
+                items={items}
+                setOpen={setOpen}
+                setValue={(callback) => {
+                    const val = callback(value);
+                    onChangeValue(val);
+                }}
+                placeholder={label}
+                style={[styles.dropdown, { backgroundColor: colors.card, borderColor: colors.border }]}
+                textStyle={{ color: colors.text }}
+                dropDownContainerStyle={{ backgroundColor: colors.card, borderColor: colors.border }}
+                listMode="SCROLLVIEW"
+            />
+        </View>
+    );
+}
+
+// Stiller
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    inner: {
-        padding: 20,
-    },
-    title: {
+    header: {
         fontSize: 22,
-        fontWeight: 'bold',
+        fontWeight: '700',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    center: {
+        alignItems: 'center',
         marginBottom: 20,
     },
+    profileImage: {
+        width: 96,
+        height: 96,
+        borderRadius: 48,
+        marginBottom: 8,
+    },
+    card: {
+        padding: 16,
+        borderRadius: 12,
+        marginBottom: 24,
+    },
     label: {
+        fontSize: 13,
+        marginBottom: 6,
+    },
+    input: {
+        borderWidth: 1,
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
         fontSize: 14,
+    },
+    dropdown: {
+        borderRadius: 8,
+    },
+    sectionTitle: {
+        fontSize: 16,
         fontWeight: '600',
         marginBottom: 8,
         marginTop: 20,
     },
-    option: {
+    saveButton: {
+        marginTop: 24,
         paddingVertical: 12,
-        paddingHorizontal: 16,
         borderWidth: 1,
-        borderRadius: 8,
-        marginBottom: 12,
+        borderRadius: 10,
+        alignItems: 'center',
     },
-    optionText: {
+    saveButtonText: {
         fontSize: 16,
-    },
-    buttonRow: {
-        flexDirection: 'row',
-        gap: 12,
-        marginTop: 8,
-    },
-    langBtn: {
-        paddingVertical: 10,
-        paddingHorizontal: 16,
-        borderWidth: 1,
-        borderRadius: 8,
+        fontWeight: '600',
     },
 });

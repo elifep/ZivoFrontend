@@ -23,5 +23,20 @@
         "edit": "Edit",
         "cancel": "Cancel",
         "save": "Save"
+    },
+    "profile": {
+        "title": "My Profile",
+        "name": "Name Surname",
+        "email": "E-Mail",
+        "birthDate": "Birth Date",
+        "phone": "Phone",
+        "address": "Address",
+        "cityCountry": "City / Country",
+        "gender": "Gender",
+        "theme": "Theme Selection",
+        "light": "Light Theme",
+        "dark": "Dark Theme",
+        "language": "Language Selection",
+        "save": "Save"
     }
 }

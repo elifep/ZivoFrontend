@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
-import { View, ScrollView, FlatList, Text, StyleSheet } from 'react-native';
+import { View, ScrollView, FlatList, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import ExploreHeader from '@/components/ExploreHeader';
 import FilterRow from '@/components/FilterRow';
 import SalonCard from '@/components/SalonCard';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { getAllSalons, getCampaignSalons } from '@/services/salonService';
+import { useRouter } from 'expo-router';
 
 export default function IndexScreen() {
   const [selectedCategory, setSelectedCategory] = useState('Hepsi');
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [salons, setSalons] = useState<any[]>([]);
   const { colors } = useAppTheme();
+  const router = useRouter();
 
   useEffect(() => {
     getCampaignSalons().then(setCampaigns);
@@ -45,26 +47,33 @@ export default function IndexScreen() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16 }}
         renderItem={({ item }) => (
-          <SalonCard
-            {...item}
-            isCampaign
-            mostLiked={item.mostLiked}
-            onToggleLike={() => toggleLike(item.id, 'campaign')}
-          />
+          <TouchableOpacity
+            onPress={() => router.push({ pathname: '/SalonDetailScreen', params: { salon: JSON.stringify(item) } })}
+          >
+            <SalonCard
+              {...item}
+              isCampaign
+              mostLiked={item.mostLiked}
+              onToggleLike={() => toggleLike(item.id, 'campaign')}
+            />
+          </TouchableOpacity>
         )}
       />
 
       {/* TÜM SALONLAR */}
       <Text style={[styles.sectionTitle, { color: colors.text }]}>Tüm Salonlar</Text>
       {salons.map((item) => (
-        <View key={item.id} style={{ paddingHorizontal: 16, marginBottom: 12 }}>
+        <TouchableOpacity
+          key={item.id}
+          onPress={() => router.push({ pathname: '/SalonDetailScreen', params: { salon: JSON.stringify(item) } })}
+          style={{ paddingHorizontal: 16, marginBottom: 12 }}
+        >
           <SalonCard
             {...item}
             fullWidth
             onToggleLike={() => toggleLike(item.id, 'all')}
-          // isCampaign gönderilmiyor = false
           />
-        </View>
+        </TouchableOpacity>
       ))}
     </ScrollView>
   );

@@ -1,3 +1,4 @@
+//data/salons.ts
 export const campaignSalons = [
     {
         id: '1',
