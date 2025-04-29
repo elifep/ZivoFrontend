@@ -4,6 +4,7 @@ import { Ionicons, Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import ReviewTab from '@/components/ReviewTab'; // 📌 Yorumlar için komponent import edildi
 import PortfolioTab from '@/components/PortfolioTab'; // 📌 Görseller için komponent import edildi
+import SalonDetailsTab from '@/components/SalonDetailsTab'; // doğru path'e göre ayarla
 
 interface Service {
     name: string;
@@ -119,9 +120,7 @@ export default function SalonDetailScreen() {
                 )}
 
                 {selectedTab === 'Detaylar' && (
-                    <View style={styles.tabContent}>
-                        <Text>Detaylar sekmesi - Açıklama ve çalışma saatleri buraya gelecek.</Text>
-                    </View>
+                    <SalonDetailsTab />
                 )}
             </ScrollView>
         </View>
