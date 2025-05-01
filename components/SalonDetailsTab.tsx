@@ -1,9 +1,21 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons, Feather, Entypo } from '@expo/vector-icons';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { Linking } from 'react-native';
 
 export default function SalonDetailsTab() {
     const { colors, isDark } = useAppTheme();
+    const openMap = () => {
+        const latitude = 41.072; // Örnek koordinat
+        const longitude = 29.007;
+
+        const url = Platform.select({
+            ios: `http://maps.apple.com/?ll=${latitude},${longitude}`,
+            android: `geo:${latitude},${longitude}?q=Rose+Life+Nişantaşı`,
+        });
+
+        Linking.openURL(url as string).catch(err => console.error('Harita açılamadı:', err));
+    };
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -16,7 +28,7 @@ export default function SalonDetailsTab() {
                         <Text style={[styles.salonName, { color: colors.text }]}>Rose Life Nişantaşı</Text>
                         <Text style={[styles.salonAddress, { color: colors.text }]}>34920 Vadi İstanbul Avrupa Yakası...</Text>
                     </View>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={openMap}>
                         <Ionicons name="location-outline" size={20} color={colors.icon} />
                     </TouchableOpacity>
                 </View>

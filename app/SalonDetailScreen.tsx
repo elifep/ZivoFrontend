@@ -102,7 +102,9 @@ export default function SalonDetailScreen() {
                                         <Text style={styles.priceText}>{service.price} ₺</Text>
                                         <Text style={styles.durationText}>{service.duration}</Text>
                                     </View>
-                                    <TouchableOpacity style={styles.bookButton}>
+                                    <TouchableOpacity
+                                        style={styles.bookButton}
+                                        onPress={() => router.push('/RandevuScreen')}>
                                         <Text style={styles.bookButtonText}>Randevu Al</Text>
                                     </TouchableOpacity>
                                 </View>
