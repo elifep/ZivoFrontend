@@ -1,18 +1,69 @@
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Platform, Image } from 'react-native';
-import { useAppTheme } from '@/hooks/useAppTheme';
+import { useAppTheme } from '@/src/hooks/useAppTheme';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, Dispatch, SetStateAction } from 'react';
-import ThemePicker from '@/components/ThemePicker';
-import LanguagePicker from '@/components/LanguagePicker';
+import ThemePicker from '@/src/components/ThemePicker';
+import LanguagePicker from '@/src/components/LanguagePicker';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { mockProfile } from '@/data/profile';
+import { mockProfile } from '@/src/data/profile';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
+import { StatusBar } from 'expo-status-bar';
 
-export default function ProfileScreen() {
-    const { colors, theme } = useAppTheme();
+// Alt Bileşenler
+function ProfileInput({ label, value, onChangeText }: { label: string; value: string; onChangeText: (text: string) => void }) {
+    const { colors } = useAppTheme();
+    return (
+        <View style={{ marginBottom: 16 }}>
+            <Text style={[styles.label, { color: colors.icon }]}>{label}</Text>
+            <TextInput
+                value={value}
+                onChangeText={onChangeText}
+                placeholder={label}
+                placeholderTextColor={colors.icon}
+                style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.background }]}
+            />
+        </View>
+    );
+}
+
+function ProfileDropdown({
+    label, open, value, items, setOpen, onChangeValue, zIndex
+}: {
+    label: string;
+    open: boolean;
+    value: string;
+    items: { label: string; value: string }[];
+    setOpen: Dispatch<SetStateAction<boolean>>;
+    onChangeValue: (val: string) => void;
+    zIndex: number;
+}) {
+    const { colors } = useAppTheme();
+    return (
+        <View style={{ marginBottom: 16, zIndex }}>
+            <Text style={[styles.label, { color: colors.icon }]}>{label}</Text>
+            <DropDownPicker
+                open={open}
+                value={value}
+                items={items}
+                setOpen={setOpen}
+                setValue={(callback) => {
+                    const val = callback(value);
+                    onChangeValue(val);
+                }}
+                placeholder={label}
+                style={[styles.dropdown, { backgroundColor: colors.card, borderColor: colors.border }]}
+                textStyle={{ color: colors.text }}
+                dropDownContainerStyle={{ backgroundColor: colors.card, borderColor: colors.border }}
+                listMode="SCROLLVIEW"
+            />
+        </View>
+    );
+}
+function ProfileScreen() {
+    const { colors, isDark, theme } = useAppTheme();
     const { t } = useTranslation();
 
     const [profile, setProfile] = useState(mockProfile);
@@ -23,7 +74,8 @@ export default function ProfileScreen() {
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+        <View style={{ flex: 1, backgroundColor: colors.background }}>
+            <StatusBar style={isDark ? 'light' : 'dark'} backgroundColor={colors.background} translucent={false} />
             <KeyboardAwareScrollView
                 contentContainerStyle={{ paddingBottom: 40, paddingHorizontal: 20 }}
                 extraScrollHeight={100}
@@ -170,60 +222,10 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
 
             </KeyboardAwareScrollView>
-        </SafeAreaView>
-    );
-}
-
-// Alt Bileşenler
-function ProfileInput({ label, value, onChangeText }: { label: string; value: string; onChangeText: (text: string) => void }) {
-    const { colors } = useAppTheme();
-    return (
-        <View style={{ marginBottom: 16 }}>
-            <Text style={[styles.label, { color: colors.icon }]}>{label}</Text>
-            <TextInput
-                value={value}
-                onChangeText={onChangeText}
-                placeholder={label}
-                placeholderTextColor={colors.icon}
-                style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.background }]}
-            />
         </View>
     );
 }
-
-function ProfileDropdown({
-    label, open, value, items, setOpen, onChangeValue, zIndex
-}: {
-    label: string;
-    open: boolean;
-    value: string;
-    items: { label: string; value: string }[];
-    setOpen: Dispatch<SetStateAction<boolean>>;
-    onChangeValue: (val: string) => void;
-    zIndex: number;
-}) {
-    const { colors } = useAppTheme();
-    return (
-        <View style={{ marginBottom: 16, zIndex }}>
-            <Text style={[styles.label, { color: colors.icon }]}>{label}</Text>
-            <DropDownPicker
-                open={open}
-                value={value}
-                items={items}
-                setOpen={setOpen}
-                setValue={(callback) => {
-                    const val = callback(value);
-                    onChangeValue(val);
-                }}
-                placeholder={label}
-                style={[styles.dropdown, { backgroundColor: colors.card, borderColor: colors.border }]}
-                textStyle={{ color: colors.text }}
-                dropDownContainerStyle={{ backgroundColor: colors.card, borderColor: colors.border }}
-                listMode="SCROLLVIEW"
-            />
-        </View>
-    );
-}
+export default ProfileScreen;
 
 // Stiller
 const styles = StyleSheet.create({

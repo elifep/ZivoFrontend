@@ -1,0 +1,20 @@
+{
+    "auth": {
+        "welcome": "أهلاً وسهلاً",
+        "login": "تسجيل الدخول",
+        "register": "إنشاء حساب",
+        "email": "أدخل بريدك الإلكتروني",
+        "password": "أدخل كلمة المرور",
+        "confirmPassword": "تأكيد كلمة المرور",
+        "noAccount": "ليس لديك حساب؟",
+        "haveAccount": "هل لديك حساب بالفعل؟",
+        "createNow": "أنشئ الآن.",
+        "loginNow": "سجّل الدخول الآن.",
+        "or": "أو",
+        "language": "اللغة",
+        "country": "الدولة",
+        "continueWithApple": "تابع باستخدام Apple",
+        "continueWithGoogle": "تابع باستخدام Google",
+        "continueWithFacebook": "تابع باستخدام Facebook"
+    }
+}

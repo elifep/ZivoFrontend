@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import SalonCard from '@/components/SalonCard';
-import { useAppTheme } from '@/hooks/useAppTheme';
-import { getAllSalons } from '@/services/salonService';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import SalonCard from '@/src/components/SalonCard';
+import { useAppTheme } from '@/src/hooks/useAppTheme';
+import { getAllSalons } from '@/src/services/salonService';
 import { useTranslation } from 'react-i18next';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function FavoritesScreen() {
     const [favorites, setFavorites] = useState<any[]>([]);
-    const { colors } = useAppTheme();
+    const { colors, isDark } = useAppTheme();
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -20,6 +21,7 @@ export default function FavoritesScreen() {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+            <StatusBar style={isDark ? 'light' : 'dark'} backgroundColor={colors.background} translucent={false} />
             <Text style={[styles.title, { color: colors.text }]}>
                 {t('favourites.title')}
             </Text>

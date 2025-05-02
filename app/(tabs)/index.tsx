@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { View, ScrollView, FlatList, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import ExploreHeader from '@/components/ExploreHeader';
-import FilterRow from '@/components/FilterRow';
-import SalonCard from '@/components/SalonCard';
-import { useAppTheme } from '@/hooks/useAppTheme';
-import { getAllSalons, getCampaignSalons } from '@/services/salonService';
+import { View, ScrollView, FlatList, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, Platform } from 'react-native';
+import ExploreHeader from '@/src/components/ExploreHeader';
+import FilterRow from '@/src/components/FilterRow';
+import SalonCard from '@/src/components/SalonCard';
+import { useAppTheme } from '@/src/hooks/useAppTheme';
+import { getAllSalons, getCampaignSalons } from '@/src/services/salonService';
 import { useRouter } from 'expo-router';
 
 export default function IndexScreen() {
@@ -34,48 +34,58 @@ export default function IndexScreen() {
   };
 
   return (
-    <ScrollView style={{ backgroundColor: colors.background }}>
-      <ExploreHeader selected={selectedCategory} onSelect={setSelectedCategory} />
-      <FilterRow />
+    <SafeAreaView style={{
+      flex: 1,
+      backgroundColor: '#000',
+      paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    }}>
+      {/* <StatusBar
+        barStyle="light-content"
+        translucent
+        backgroundColor="#000" /> */}
+      <ScrollView style={{ backgroundColor: colors.background }}>
+        <ExploreHeader selected={selectedCategory} onSelect={setSelectedCategory} />
+        <FilterRow />
 
-      {/* POPÜLER KAMPANYALAR */}
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>Popüler Kampanyalar</Text>
-      <FlatList
-        data={campaigns}
-        horizontal
-        keyExtractor={(item) => item.id}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16 }}
-        renderItem={({ item }) => (
+        {/* POPÜLER KAMPANYALAR */}
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Popüler Kampanyalar</Text>
+        <FlatList
+          data={campaigns}
+          horizontal
+          keyExtractor={(item) => item.id}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 16 }}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => router.push({ pathname: '/SalonDetailScreen', params: { salon: JSON.stringify(item) } })}
+            >
+              <SalonCard
+                {...item}
+                isCampaign
+                mostLiked={item.mostLiked}
+                onToggleLike={() => toggleLike(item.id, 'campaign')}
+              />
+            </TouchableOpacity>
+          )}
+        />
+
+        {/* TÜM SALONLAR */}
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Tüm Salonlar</Text>
+        {salons.map((item) => (
           <TouchableOpacity
+            key={item.id}
             onPress={() => router.push({ pathname: '/SalonDetailScreen', params: { salon: JSON.stringify(item) } })}
+            style={{ paddingHorizontal: 16, marginBottom: 12 }}
           >
             <SalonCard
               {...item}
-              isCampaign
-              mostLiked={item.mostLiked}
-              onToggleLike={() => toggleLike(item.id, 'campaign')}
+              fullWidth
+              onToggleLike={() => toggleLike(item.id, 'all')}
             />
           </TouchableOpacity>
-        )}
-      />
-
-      {/* TÜM SALONLAR */}
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>Tüm Salonlar</Text>
-      {salons.map((item) => (
-        <TouchableOpacity
-          key={item.id}
-          onPress={() => router.push({ pathname: '/SalonDetailScreen', params: { salon: JSON.stringify(item) } })}
-          style={{ paddingHorizontal: 16, marginBottom: 12 }}
-        >
-          <SalonCard
-            {...item}
-            fullWidth
-            onToggleLike={() => toggleLike(item.id, 'all')}
-          />
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

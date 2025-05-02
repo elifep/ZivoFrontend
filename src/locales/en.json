@@ -1,0 +1,60 @@
+{
+    "home": {
+        "title": "Home",
+        "greeting": "Welcome {{name}}!"
+    },
+    "profile": {
+        "title": "My Profile",
+        "language": "Select Language"
+    },
+    "tabs": {
+        "favourites": "Favourites",
+        "explore": "Explore",
+        "appointments": "My Appointments",
+        "profile": "Profile"
+    },
+    "favourites": {
+        "title": "My Favourite Salons"
+    },
+    "appointments": {
+        "employee": "Employee"
+    },
+    "buttons": {
+        "edit": "Edit",
+        "cancel": "Cancel",
+        "save": "Save"
+    },
+    "profile": {
+        "title": "My Profile",
+        "name": "Name Surname",
+        "email": "E-Mail",
+        "birthDate": "Birth Date",
+        "phone": "Phone",
+        "address": "Address",
+        "cityCountry": "City / Country",
+        "gender": "Gender",
+        "theme": "Theme Selection",
+        "light": "Light Theme",
+        "dark": "Dark Theme",
+        "language": "Language Selection",
+        "save": "Save"
+    },
+    "auth": {
+        "welcome": "WELCOME",
+        "login": "Login",
+        "register": "Register",
+        "email": "Enter your e-mail.",
+        "password": "Enter your password.",
+        "confirmPassword": "Confirm Password",
+        "noAccount": "Don’t have an account?",
+        "haveAccount": "Already have an account?",
+        "createNow": "Create Now.",
+        "loginNow": "Login Now.",
+        "or": "or",
+        "language": "Language",
+        "country": "Country",
+        "continueWithApple": "Continue with Apple",
+        "continueWithGoogle": "Continue with Google",
+        "continueWithFacebook": "Continue with Facebook"
+    }
+}

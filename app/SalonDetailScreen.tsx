@@ -1,10 +1,11 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, TextInput, StatusBar } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { useState } from 'react';
-import ReviewTab from '@/components/ReviewTab'; // 📌 Yorumlar için komponent import edildi
-import PortfolioTab from '@/components/PortfolioTab'; // 📌 Görseller için komponent import edildi
-import SalonDetailsTab from '@/components/SalonDetailsTab'; // doğru path'e göre ayarla
+import ReviewTab from '@/src/components/ReviewTab'; // 📌 Yorumlar için komponent import edildi
+import PortfolioTab from '@/src/components/PortfolioTab'; // 📌 Görseller için komponent import edildi
+import SalonDetailsTab from '@/src/components/SalonDetailsTab'; // doğru path'e göre ayarla
+import { useAppTheme } from '@/src/hooks/useAppTheme';
 
 interface Service {
     name: string;
@@ -23,6 +24,7 @@ const dummyServices: Service[] = [
 ];
 
 export default function SalonDetailScreen() {
+    const { colors, isDark } = useAppTheme();
     const router = useRouter();
     const { salon } = useLocalSearchParams();
     const salonData = JSON.parse(salon as string);
@@ -36,11 +38,15 @@ export default function SalonDetailScreen() {
     );
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#fff' }}>
+        <View style={{ flex: 1, backgroundColor: colors.background }}>
+            <StatusBar
+                backgroundColor={colors.background}
+                barStyle={isDark ? 'light-content' : 'dark-content'}
+            />
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
                 {/* Salon Görseli */}
                 <View style={styles.imageContainer}>
-                    <Image source={salonData.image} style={styles.salonImage} />
+                    <Image source={salonData.image} style={[styles.salonImage, { backgroundColor: colors.background }]} />
 
                     {/* Geri Dön Butonu */}
                     <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
@@ -73,39 +79,39 @@ export default function SalonDetailScreen() {
                 </View>
 
                 {/* Sekmeler */}
-                <View style={styles.tabContainer}>
+                <View style={[styles.tabContainer, { backgroundColor: colors.background }]}>
                     {['Hizmetler', 'Yorumlar', 'Portföy', 'Detaylar'].map(tab => (
                         <TouchableOpacity key={tab} onPress={() => setSelectedTab(tab)} style={styles.tabButton}>
-                            <Text style={[styles.tabText, selectedTab === tab && styles.activeTabText]}>
+                            <Text style={[styles.tabText, { color: colors.text }, selectedTab === tab && styles.activeTabText, selectedTab === tab && { color: colors.primary }]}>
                                 {tab}
                             </Text>
-                            {selectedTab === tab && <View style={styles.activeTabIndicator} />}
+                            {selectedTab === tab && <View style={[styles.activeTabIndicator, { backgroundColor: colors.primary }]} />}
                         </TouchableOpacity>
                     ))}
                 </View>
 
                 {/* İçerik */}
                 {selectedTab === 'Hizmetler' && (
-                    <View style={styles.servicesContainer}>
+                    <View style={[styles.servicesContainer, { backgroundColor: colors.background }]}>
                         <TextInput
                             placeholder="Hizmet arayın..."
                             placeholderTextColor="#888"
-                            style={styles.searchInput}
+                            style={[styles.searchInput, { backgroundColor: colors.searchBackground }, { color: colors.text }]}
                             value={searchTerm}
                             onChangeText={setSearchTerm}
                         />
                         {filteredServices.map((service, index) => (
-                            <View key={index} style={styles.serviceRow}>
-                                <Text style={styles.serviceName}>{service.name}</Text>
+                            <View key={index} style={[styles.serviceRow, { borderBottomColor: colors.borderBottom }]}>
+                                <Text style={[styles.serviceName, { color: colors.text }]}>{service.name}</Text>
                                 <View style={styles.serviceRight}>
                                     <View style={{ alignItems: 'flex-end', marginRight: 8 }}>
-                                        <Text style={styles.priceText}>{service.price} ₺</Text>
-                                        <Text style={styles.durationText}>{service.duration}</Text>
+                                        <Text style={[styles.priceText, { color: colors.text }]}>{service.price} ₺</Text>
+                                        <Text style={[styles.durationText, { color: colors.durationText }]}>{service.duration}</Text>
                                     </View>
                                     <TouchableOpacity
-                                        style={styles.bookButton}
+                                        style={[styles.bookButton, { backgroundColor: colors.primary }]}
                                         onPress={() => router.push('/RandevuScreen')}>
-                                        <Text style={styles.bookButtonText}>Randevu Al</Text>
+                                        <Text style={[styles.bookButtonText, { color: colors.background }]}>Randevu Al</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
@@ -150,19 +156,19 @@ const styles = StyleSheet.create({
     discountBadge: { backgroundColor: '#fff', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
     discountText: { fontSize: 12, fontWeight: 'bold', color: '#000' },
     salonAddress: { color: '#ccc', fontSize: 13, marginTop: 2 },
-    tabContainer: { flexDirection: 'row', backgroundColor: '#fff', paddingVertical: 8, borderBottomColor: '#eee', borderBottomWidth: 1 },
+    tabContainer: { flexDirection: 'row', paddingVertical: 8, borderBottomWidth: 1 },
     tabButton: { flex: 1, alignItems: 'center' },
-    tabText: { color: '#888', fontSize: 14 },
-    activeTabText: { color: '#000', fontWeight: 'bold' },
-    activeTabIndicator: { width: '100%', height: 2, backgroundColor: '#000', marginTop: 4 },
+    tabText: { fontSize: 14 },
+    activeTabText: { fontWeight: 'bold' },
+    activeTabIndicator: { width: '100%', height: 2, marginTop: 4 },
     servicesContainer: { padding: 16 },
-    searchInput: { backgroundColor: '#f3f3f3', padding: 10, borderRadius: 8, marginBottom: 16, color: '#000' },
-    serviceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomColor: '#eee', borderBottomWidth: 1 },
-    serviceName: { fontSize: 16, color: '#000' },
+    searchInput: { padding: 10, borderRadius: 8, marginBottom: 16 },
+    serviceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1 },
+    serviceName: { fontSize: 16 },
     serviceRight: { flexDirection: 'row', alignItems: 'center' },
-    priceText: { fontSize: 15, fontWeight: 'bold', color: '#000' },
-    durationText: { fontSize: 12, color: '#999' },
-    bookButton: { backgroundColor: '#000', paddingVertical: 6, paddingHorizontal: 10, borderRadius: 6 },
-    bookButtonText: { color: '#fff', fontSize: 12 },
+    priceText: { fontSize: 15, fontWeight: 'bold' },
+    durationText: { fontSize: 12 },
+    bookButton: { paddingVertical: 6, paddingHorizontal: 10, borderRadius: 6 },
+    bookButtonText: { fontSize: 12 },
     tabContent: { padding: 16 },
 });

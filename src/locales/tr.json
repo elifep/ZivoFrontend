@@ -1,0 +1,60 @@
+{
+  "home": {
+    "title": "Ana Sayfa",
+    "greeting": "Hoş geldin {{name}}!"
+  },
+  "profile": {
+    "title": "Profilim",
+    "language": "Dil Seç"
+  },
+  "tabs": {
+    "favourites": "Favoriler",
+    "explore": "Keşfet",
+    "appointments": "Randevularım",
+    "profile": "Profil"
+  },
+  "favourites": {
+    "title": "Favori Salonlarım"
+  },
+  "appointments": {
+    "employee": "Çalışan"
+  },
+  "buttons": {
+    "edit": "Düzenle",
+    "cancel": "İptal Et",
+    "save": "Kaydet"
+  },
+  "profile": {
+    "title": "Profilim",
+    "name": "Ad Soyad",
+    "email": "E-Mail",
+    "birthDate": "Doğum Tarihi",
+    "phone": "Telefon",
+    "address": "Adres",
+    "cityCountry": "Şehir / Ülke",
+    "gender": "Cinsiyet",
+    "theme": "Tema Seçimi",
+    "light": "Açık Tema",
+    "dark": "Koyu Tema",
+    "language": "Dil Seçimi",
+    "save": "Kaydet"
+  },
+  "auth": {
+    "welcome": "HOŞ GELDİNİZ",
+    "login": "Giriş Yap",
+    "register": "Kayıt Ol",
+    "email": "E-Mail girin.",
+    "password": "Şifre girin.",
+    "confirmPassword": "Şifreyi Doğrula",
+    "noAccount": "Hesabın yok mu?",
+    "haveAccount": "Zaten hesabın var mı?",
+    "createNow": "Hemen Oluştur.",
+    "loginNow": "Şimdi Giriş Yap.",
+    "or": "veya",
+    "language": "Dil",
+    "country": "Ülke",
+    "continueWithApple": "Apple ile devam et",
+    "continueWithGoogle": "Google ile devam et",
+    "continueWithFacebook": "Facebook ile devam et"
+  }
+}

@@ -1,0 +1,33 @@
+// theme.ts
+export const themes = {
+    light: {
+        background: '#FFFFFF',
+        text: '#000000',
+        primary: '#000000',
+        card: '#F8F8F8',
+        border: '#DDDDDD',
+        borderBottom: '#eee',
+        icon: '#333333',
+        searchBackground: '#f3f3f3',
+        mutedText: '#999999',
+        softButton: '#EEEEEE',
+        softBorder: '#CCCCCC',
+        buttonText: '#FFFFFF',
+        durationText: '#999',
+    },
+    dark: {
+        background: '#000000',
+        text: '#FFFFFF',
+        primary: '#FFFFFF',
+        card: '#1A1A1A',
+        border: '#444444',
+        borderBottom: '#FFFFFF',
+        icon: '#AAAAAA', // daha koyu ton
+        searchBackground: '#2A2A2A',
+        mutedText: '#AAAAAA',
+        softButton: '#333333',
+        softBorder: '#444444',
+        buttonText: '#000000',
+        durationText: '#999',
+    },
+};

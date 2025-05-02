@@ -1,20 +1,35 @@
 import { Stack } from 'expo-router';
-import { ThemeProvider } from '@/context/ThemeContext';
 import { StatusBar } from 'expo-status-bar';
-import './config/i18n';
+import { ThemeProvider, useTheme } from '@/src/context/ThemeContext';
+import { usePathname } from 'expo-router';
+import '@/src/config/i18n';
+
+function StatusBarWithTheme() {
+  const { theme } = useTheme();
+  const pathname = usePathname();
+
+  const isIndex = pathname === '/';
+  // console.log('isIndex', isIndex);
+
+  return (
+    <StatusBar
+      style={(isIndex || theme === 'dark') ? 'light' : 'dark'}
+      backgroundColor={isIndex ? '#000' : 'transparent'}
+      translucent={!isIndex}
+    />
+  );
+}
 
 export default function RootLayout() {
   return (
     <ThemeProvider>
+      <StatusBarWithTheme />
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="SalonDetailScreen" options={{ headerShown: false, presentation: 'card' }} />
-        <Stack.Screen name="salon-services" options={{ headerShown: false, presentation: 'card' }} />
-        <Stack.Screen name="salon-reviews" options={{ headerShown: false, presentation: 'card' }} />
-        <Stack.Screen name="salon-portfolio" options={{ headerShown: false, presentation: 'card' }} />
-        <Stack.Screen name="salon-details" options={{ headerShown: false, presentation: 'card' }} />
+        <Stack.Screen name="RandevuScreen" options={{ headerShown: false, presentation: 'card' }} />
+        <Stack.Screen name="EditAppointmentScreen" options={{ headerShown: false, presentation: 'card' }} />
       </Stack>
-      <StatusBar style="auto" />
     </ThemeProvider>
   );
 }
