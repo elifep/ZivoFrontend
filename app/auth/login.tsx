@@ -26,8 +26,8 @@ export default function LoginScreen() {
             <Text style={{ fontSize: 28, fontWeight: '500', marginBottom: 20 }}>{t('auth.login')}</Text>
 
             {/* Form */}
-            <TextInput style={styles.input} placeholder="E-mail girin." placeholderTextColor="#999" />
-            <TextInput style={styles.input} placeholder="Şifre girin." secureTextEntry placeholderTextColor="#999" />
+            <TextInput style={styles.input} placeholder={t('auth.emailPlaceholder')} placeholderTextColor="#999" />
+            <TextInput style={styles.input} placeholder={t('auth.passwordPlaceholder')} secureTextEntry placeholderTextColor="#999" />
 
             <TouchableOpacity style={styles.loginBtn}>
                 <Text style={styles.loginBtnText}>{t('auth.login')}</Text>

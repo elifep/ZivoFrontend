@@ -1,4 +1,40 @@
 {
+    "home": {
+        "title": "الصفحة الرئيسية",
+        "greeting": "مرحباً {{name}}!"
+    },
+    "tabs": {
+        "favourites": "المفضلة",
+        "explore": "استكشاف",
+        "appointments": "مواعيدي",
+        "profile": "الملف الشخصي"
+    },
+    "favourites": {
+        "title": "صالوناتي المفضلة"
+    },
+    "appointments": {
+        "employee": "الموظف"
+    },
+    "buttons": {
+        "edit": "تعديل",
+        "cancel": "إلغاء",
+        "save": "حفظ"
+    },
+    "profile": {
+        "title": "الملف الشخصي",
+        "name": "الاسم الكامل",
+        "email": "البريد الإلكتروني",
+        "birthDate": "تاريخ الميلاد",
+        "phone": "الهاتف",
+        "address": "العنوان",
+        "cityCountry": "المدينة / الدولة",
+        "gender": "الجنس",
+        "theme": "اختيار المظهر",
+        "light": "المظهر الفاتح",
+        "dark": "المظهر الداكن",
+        "language": "اختيار اللغة",
+        "save": "حفظ"
+    },
     "auth": {
         "welcome": "أهلاً وسهلاً",
         "login": "تسجيل الدخول",
@@ -15,6 +51,8 @@
         "country": "الدولة",
         "continueWithApple": "تابع باستخدام Apple",
         "continueWithGoogle": "تابع باستخدام Google",
-        "continueWithFacebook": "تابع باستخدام Facebook"
+        "continueWithFacebook": "تابع باستخدام Facebook",
+        "emailPlaceholder": "أدخل بريدك الإلكتروني",
+        "passwordPlaceholder": "أدخل كلمة المرور الخاصة بك"
     }
 }

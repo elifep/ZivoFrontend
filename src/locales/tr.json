@@ -3,10 +3,6 @@
     "title": "Ana Sayfa",
     "greeting": "Hoş geldin {{name}}!"
   },
-  "profile": {
-    "title": "Profilim",
-    "language": "Dil Seç"
-  },
   "tabs": {
     "favourites": "Favoriler",
     "explore": "Keşfet",
@@ -55,6 +51,8 @@
     "country": "Ülke",
     "continueWithApple": "Apple ile devam et",
     "continueWithGoogle": "Google ile devam et",
-    "continueWithFacebook": "Facebook ile devam et"
+    "continueWithFacebook": "Facebook ile devam et",
+    "emailPlaceholder": "E-mail girin.",
+    "passwordPlaceholder": "Şifre girin."
   }
 }

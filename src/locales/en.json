@@ -3,10 +3,6 @@
         "title": "Home",
         "greeting": "Welcome {{name}}!"
     },
-    "profile": {
-        "title": "My Profile",
-        "language": "Select Language"
-    },
     "tabs": {
         "favourites": "Favourites",
         "explore": "Explore",
@@ -55,6 +51,8 @@
         "country": "Country",
         "continueWithApple": "Continue with Apple",
         "continueWithGoogle": "Continue with Google",
-        "continueWithFacebook": "Continue with Facebook"
+        "continueWithFacebook": "Continue with Facebook",
+        "emailPlaceholder": "Enter your email.",
+        "passwordPlaceholder": "Enter your password."
     }
 }
