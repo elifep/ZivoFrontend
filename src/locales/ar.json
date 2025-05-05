@@ -13,7 +13,13 @@
         "title": "صالوناتي المفضلة"
     },
     "appointments": {
-        "employee": "الموظف"
+        "title": "المواعيد",
+        "employee": "الموظف",
+        "edit": "تعديل",
+        "cancel": "إلغاء",
+        "noAppointments": "لا توجد مواعيد في التاريخ المحدد.",
+        "noAppointmentsShort": "لا توجد مواعيد",
+        "today": "اليوم"
     },
     "buttons": {
         "edit": "تعديل",
@@ -42,6 +48,10 @@
         "email": "أدخل بريدك الإلكتروني",
         "password": "أدخل كلمة المرور",
         "confirmPassword": "تأكيد كلمة المرور",
+        "confirmPasswordPlaceholder": "أعد إدخال كلمة المرور.",
+        "confirmPasswordError": "كلمتا المرور غير متطابقتين.",
+        "registerSuccess": "تم التسجيل بنجاح! سيتم تحويلك لصفحة تسجيل الدخول.",
+        "registerError": "فشل في التسجيل.",
         "noAccount": "ليس لديك حساب؟",
         "haveAccount": "هل لديك حساب بالفعل؟",
         "createNow": "أنشئ الآن.",
@@ -54,5 +64,13 @@
         "continueWithFacebook": "تابع باستخدام Facebook",
         "emailPlaceholder": "أدخل بريدك الإلكتروني",
         "passwordPlaceholder": "أدخل كلمة المرور الخاصة بك"
+    },
+    "toast": {
+        "missingFieldsTitle": "خطأ",
+        "missingFields": "يرجى إدخال البريد الإلكتروني وكلمة المرور.",
+        "loginSuccessTitle": "تم تسجيل الدخول",
+        "loginSuccess": "مرحباً بك!",
+        "loginErrorTitle": "فشل تسجيل الدخول",
+        "loginError": "البريد الإلكتروني أو كلمة المرور غير صحيحة."
     }
 }

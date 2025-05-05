@@ -6,7 +6,6 @@ import tr from '../locales/tr.json';
 import en from '../locales/en.json';
 import ar from '../locales/ar.json';
 
-
 i18n
   .use(initReactI18next)
   .init({

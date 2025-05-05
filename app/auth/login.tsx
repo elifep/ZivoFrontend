@@ -4,10 +4,65 @@ import { useState } from 'react';
 import { router } from 'expo-router';
 import LanguageSelector from '@/src/components/LanguageSelector';
 import { useTranslation } from 'react-i18next';
+import Toast from 'react-native-toast-message';
+import { useAuthStore } from '@/src/stores/authStore';
 
 export default function LoginScreen() {
     const { t } = useTranslation();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const handleLogin = async () => {
+            if (!email || !password) {
+            Toast.show({
+                type: 'error',
+                text1: t('toast.missingFieldsTitle'),
+                text2: t('toast.missingFields'),
+            });
+            return;
+        }
+        try {
+            await useAuthStore.getState().login(email, password);
+            Toast.show({
+              type: 'success',
+              text1: t('toast.loginSuccessTitle'),
+              text2: t('toast.loginSuccess'),
+            });
+            router.replace('/(tabs)');
+          } catch (error: any) {
+            Toast.show({
+              type: 'error',
+              text1: t('toast.loginErrorTitle'),
+              text2: t('toast.loginError'),
+            });
+          }
 
+        // // Örnek sabit giriş kontrolü
+        // if (email === 'eee' && password === '12345') {
+        //     console.log("Giriş başarılı");
+        //     Toast.show({
+        //         type: 'success',
+        //         text1: t('toast.loginSuccessTitle'),
+        //         text2: t('toast.loginSuccess'),
+        //     });
+        //     // ✅ yönlendirme: (tabs)/index.tsx => Keşfet sayfası
+        //     setTimeout(() => {
+        //         router.replace('/(tabs)');
+        //     }, 800); // Toast görünsün diye küçük bir gecikme
+
+        //     return;
+        // }
+
+        // Devamında yönlendirme yapılabilir
+        // router.push('/(tabs)');
+
+        // if (email !== 'eee' || password !== '123456') {
+        //     Toast.show({
+        //         type: 'error',
+        //         text1: t('toast.loginErrorTitle'),
+        //         text2: t('toast.loginError'),
+        //     });
+        // }
+    };
     return (
         <ScrollView contentContainerStyle={styles.container}>
             {/* Logo */}
@@ -26,10 +81,12 @@ export default function LoginScreen() {
             <Text style={{ fontSize: 28, fontWeight: '500', marginBottom: 20 }}>{t('auth.login')}</Text>
 
             {/* Form */}
-            <TextInput style={styles.input} placeholder={t('auth.emailPlaceholder')} placeholderTextColor="#999" />
-            <TextInput style={styles.input} placeholder={t('auth.passwordPlaceholder')} secureTextEntry placeholderTextColor="#999" />
+            <TextInput style={styles.input} placeholder={t('auth.emailPlaceholder')} placeholderTextColor="#999" value={email}
+                onChangeText={setEmail} />
+            <TextInput style={styles.input} placeholder={t('auth.passwordPlaceholder')} secureTextEntry placeholderTextColor="#999" value={password}
+                onChangeText={setPassword} />
 
-            <TouchableOpacity style={styles.loginBtn}>
+            <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
                 <Text style={styles.loginBtnText}>{t('auth.login')}</Text>
             </TouchableOpacity>
 

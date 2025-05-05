@@ -13,7 +13,13 @@
     "title": "Favori Salonlarım"
   },
   "appointments": {
-    "employee": "Çalışan"
+    "title": "Randevular",
+    "employee": "Çalışan",
+    "edit": "Düzenle",
+    "cancel": "İptal Et",
+    "noAppointments": "Seçili tarihte bir randevunuz bulunmamaktadır.",
+    "noAppointmentsShort": "Randevu bulunamadı",
+    "today": "Bugün"
   },
   "buttons": {
     "edit": "Düzenle",
@@ -42,6 +48,10 @@
     "email": "E-Mail girin.",
     "password": "Şifre girin.",
     "confirmPassword": "Şifreyi Doğrula",
+    "confirmPasswordPlaceholder": "Şifreyi tekrar girin.",
+    "confirmPasswordError": "Şifreler uyuşmuyor.",
+    "registerSuccess": "Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz.",
+    "registerError": "Kayıt başarısız.",
     "noAccount": "Hesabın yok mu?",
     "haveAccount": "Zaten hesabın var mı?",
     "createNow": "Hemen Oluştur.",
@@ -54,5 +64,13 @@
     "continueWithFacebook": "Facebook ile devam et",
     "emailPlaceholder": "E-mail girin.",
     "passwordPlaceholder": "Şifre girin."
+  },
+  "toast": {
+    "missingFieldsTitle": "Hata",
+    "missingFields": "Lütfen e-posta ve şifrenizi girin.",
+    "loginSuccessTitle": "Giriş Başarılı",
+    "loginSuccess": "Hoş geldiniz!",
+    "loginErrorTitle": "Giriş Başarısız",
+    "loginError": "E-posta veya şifre hatalı."
   }
 }

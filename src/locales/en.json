@@ -13,7 +13,13 @@
         "title": "My Favourite Salons"
     },
     "appointments": {
-        "employee": "Employee"
+        "title": "Appointments",
+        "employee": "Employee",
+        "edit": "Edit",
+        "cancel": "Cancel",
+        "noAppointments": "You have no appointments on the selected date.",
+        "noAppointmentsShort": "No appointments found",
+        "today": "Today"
     },
     "buttons": {
         "edit": "Edit",
@@ -42,6 +48,10 @@
         "email": "Enter your e-mail.",
         "password": "Enter your password.",
         "confirmPassword": "Confirm Password",
+        "confirmPasswordPlaceholder": "Re-enter your password.",
+        "confirmPasswordError": "Passwords do not match.",
+        "registerSuccess": "Registration successful! You will be redirected to the login page.",
+        "registerError": "Registration failed.",
         "noAccount": "Don’t have an account?",
         "haveAccount": "Already have an account?",
         "createNow": "Create Now.",
@@ -54,5 +64,13 @@
         "continueWithFacebook": "Continue with Facebook",
         "emailPlaceholder": "Enter your email.",
         "passwordPlaceholder": "Enter your password."
+    },
+    "toast": {
+        "missingFieldsTitle": "Error",
+        "missingFields": "Please enter your email and password.",
+        "loginSuccessTitle": "Login Successful",
+        "loginSuccess": "Welcome!",
+        "loginErrorTitle": "Login Failed",
+        "loginError": "Invalid email or password."
     }
 }

@@ -1,8 +1,8 @@
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Modal, ActivityIndicator } from 'react-native';
 import { useAppTheme } from '@/src/hooks/useAppTheme';
 import { mockAppointments } from '@/src/data/appointments';
 import { Calendar } from 'react-native-calendars';
-import { Feather, FontAwesome5 } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect } from 'react';
 import { LocaleConfig } from 'react-native-calendars';
@@ -11,45 +11,106 @@ import { setupCalendarLocales } from '@/src/config/calendarLocales';
 import { formatDate } from '@/src/config/date';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { format } from 'date-fns'; // en üstte
+type Appointment = {
+    id: string;
+    date: string;
+    salon: string;
+    service: string;
+    employee: string;
+    price: number;
+    start: string;
+    end: string;
+    status: 'active' | 'cancelled';
+};
 
 export default function AppointmentsScreen() {
     const { colors, isDark } = useAppTheme();
-    const { i18n } = useTranslation();
-    const [selectedDate, setSelectedDate] = useState('2025-04-10');
+    const { t, i18n } = useTranslation();
+    const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
     const router = useRouter();
 
     const appointments = mockAppointments.filter(a => a.date === selectedDate);
 
+    const [calendarReady, setCalendarReady] = useState(false);
+    const [selectedToCancel, setSelectedToCancel] = useState<Appointment | null>(null);
+    const [cancelStep, setCancelStep] = useState<'confirm' | 'loading' | 'success' | null>(null);
+
+
+    useEffect(() => {
+        if (cancelStep === 'success') {
+            const timeout = setTimeout(() => {
+                setCancelStep(null);
+                setSelectedToCancel(null);
+            }, 1500);
+            return () => clearTimeout(timeout);
+        }
+    }, [cancelStep]);
+
     useEffect(() => {
         setupCalendarLocales();
-        LocaleConfig.defaultLocale = i18n.language.startsWith('tr') ? 'tr' : 'en';
+        LocaleConfig.defaultLocale = i18n.language;
+        setCalendarReady(false);
+        setTimeout(() => setCalendarReady(true), 50); // kısa bir bekleme ile yeniden render
     }, [i18n.language]);
 
     return (
         <View style={{ flex: 1, backgroundColor: colors.background }}>
             <StatusBar style={isDark ? 'light' : 'dark'} backgroundColor={colors.background} translucent={false} />
             <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-                <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
-                    <Calendar
-                        key={i18n.language}
-                        onDayPress={(day) => setSelectedDate(day.dateString)}
-                        markedDates={{
-                            [selectedDate]: { selected: true, selectedColor: colors.primary },
-                        }}
-                        theme={{
-                            calendarBackground: colors.background,
-                            dayTextColor: colors.text,
-                            monthTextColor: colors.text,
-                            todayTextColor: colors.primary,
-                            selectedDayBackgroundColor: colors.primary,
-                            selectedDayTextColor: colors.background,
-                            arrowColor: colors.text,
-                        }}
-                    />
+                <Text
+                    style={{
+                        fontSize: 22,
+                        fontWeight: 'bold',
+                        color: colors.text,
+                        textAlign: 'center',
+                        marginTop: 16,
+                        marginHorizontal: 16,
+                        marginBottom: 8,
+                    }}
+                >
+                    {t('appointments.title')}
+                </Text>
 
-                    <Text style={[styles.dateText, { color: colors.text }]}>
-                        {formatDate(selectedDate, i18n.language.startsWith('tr') ? 'tr' : 'en')}
+                <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
+
+                    {calendarReady && (
+                        <Calendar
+                            current={selectedDate} // bugünün tarihi burada
+                            key={i18n.language}
+                            onDayPress={(day) => setSelectedDate(day.dateString)}
+                            markedDates={{
+                                [selectedDate]: { selected: true, selectedColor: colors.primary },
+                            }}
+                            theme={{
+                                calendarBackground: colors.background,
+                                dayTextColor: colors.text,
+                                monthTextColor: colors.text,
+                                todayTextColor: colors.primary,
+                                selectedDayBackgroundColor: colors.primary,
+                                selectedDayTextColor: colors.background,
+                                arrowColor: colors.text,
+                            }}
+                        />
+                    )}
+
+                    <Text
+                        style={[
+                            styles.dateText,
+                            { color: colors.text }
+                        ]}
+                    >
+                        {formatDate(selectedDate, i18n.language)}
                     </Text>
+
+                    {appointments.length === 0 && (
+                        <View style={[styles.noAppointmentBox, { backgroundColor: colors.card, borderColor: colors.softBorder }]}>
+                            <Feather name="calendar" size={20} color={colors.icon} style={{ marginBottom: 6 }} />
+                            <Text style={{ color: colors.text, fontSize: 14, textAlign: 'center' }}>
+                                {t('appointments.noAppointments')}
+                            </Text>
+                        </View>
+                    )}
 
                     {appointments.map((a) => (
                         <View key={a.id} style={[styles.card, { backgroundColor: colors.card }]}>
@@ -68,7 +129,7 @@ export default function AppointmentsScreen() {
                                     </View>
                                     <View style={styles.infoRow}>
                                         <Feather name="user" size={14} color={colors.icon} />
-                                        <Text style={[styles.infoText, { color: colors.icon }]}>Çalışan: {a.employee}</Text>
+                                        <Text style={[styles.infoText, { color: colors.icon }]}>{t('appointments.employee')}: {a.employee}</Text>
                                     </View>
                                 </View>
                                 <View style={{ alignItems: 'flex-end' }}>
@@ -79,17 +140,84 @@ export default function AppointmentsScreen() {
                             <View style={styles.buttonRow}>
                                 <TouchableOpacity style={[styles.actionButton, styles.editButton]} onPress={() => router.push({ pathname: '/EditAppointmentScreen', params: { appointment: JSON.stringify(a) } })}>
                                     <Text style={styles.editButtonText}>
-                                        <Feather name="edit" size={14} color="#1585A6" /> Düzenle
+                                        <Feather name="edit" size={14} color="#1585A6" /> {t('appointments.edit')}
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.actionButton, styles.cancelButton]}>
+                                <TouchableOpacity style={[styles.actionButton, styles.cancelButton]} onPress={() => {
+                                    setSelectedToCancel(a);       // hangi randevuyu iptal edeceğini ayarla
+                                    setCancelStep('confirm');     // 1. modalı aç
+                                }}
+                                >
                                     <Text style={styles.cancelButtonText}>
-                                        <Feather name="x-circle" size={14} color="#d9534f" /> İptal Et
+                                        <Feather name="x-circle" size={14} color="#d9534f" /> {t('appointments.cancel')}
                                     </Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
                     ))}
+
+                    <Modal transparent visible={cancelStep !== null} animationType="fade">
+                        <View style={styles.modalOverlay}>
+                            <View style={[
+                                styles.modalBox,
+                                cancelStep === 'success' ? styles.successBox :
+                                    cancelStep === 'loading' ? styles.loadingBox :
+                                        styles.confirmBox
+                            ]}>
+                                {/* Başlık */}
+                                <View style={styles.modalHeader}>
+                                    <Text style={styles.modalTitle}>
+                                        {cancelStep === 'success' && 'Onay ✅'}
+                                        {cancelStep === 'loading' && 'İptal 🔄'}
+                                        {cancelStep === 'confirm' && 'İptal ❌'}
+                                    </Text>
+                                </View>
+
+                                {/* İçerik */}
+                                {cancelStep === 'confirm' && (
+                                    <>
+                                        <Text style={styles.modalText}>İptal etmek istediğinize emin misiniz?</Text>
+                                        <View style={styles.modalButtonRow}>
+                                            <TouchableOpacity
+                                                style={styles.modalButton}
+                                                onPress={() => {
+                                                    setCancelStep('loading');
+                                                    setTimeout(() => {
+                                                        // iptal işlemi
+                                                        // burada selectedToCancel.status = 'cancelled' gibi güncelleme yapabilirsin
+                                                        // örnek için basit bir state update yazılabilir
+                                                        setCancelStep('success');
+                                                    }, 1500);
+                                                }}
+                                            >
+                                                <Text style={styles.modalButtonText}>Evet</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                style={[styles.modalButton, { backgroundColor: '#ccc' }]}
+                                                onPress={() => setCancelStep(null)}
+                                            >
+                                                <Text style={styles.modalButtonText}>Hayır</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </>
+                                )}
+
+                                {cancelStep === 'loading' && (
+                                    <>
+                                        <Text style={styles.modalText}>Randevu iptal ediliyor..</Text>
+                                        <ActivityIndicator size="large" color="#e11d48" style={{ marginTop: 16 }} />
+                                    </>
+                                )}
+                                {cancelStep === 'success' && (
+                                    <>
+                                        <Text style={styles.modalText}>
+                                            Randevu başarılı bir şekilde iptal edilmiştir.
+                                        </Text>
+                                    </>
+                                )}
+                            </View>
+                        </View>
+                    </Modal>
                 </ScrollView>
             </SafeAreaView>
         </View>
@@ -171,5 +299,66 @@ const styles = StyleSheet.create({
     serviceLine: {
         height: 1,
         marginVertical: 8,
+    },
+    noAppointmentBox: {
+        marginHorizontal: 16,
+        marginTop: 12,
+        marginBottom: 24,
+        padding: 16,
+        borderRadius: 12,
+        borderWidth: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    modalBox: {
+        width: '80%',
+        borderRadius: 12,
+        padding: 20,
+        backgroundColor: 'white',
+        alignItems: 'center',
+    },
+    confirmBox: {
+        borderColor: '#e11d48',
+        borderWidth: 2,
+    },
+    loadingBox: {
+        borderColor: '#facc15',
+        borderWidth: 2,
+    },
+    successBox: {
+        borderColor: '#22c55e',
+        borderWidth: 2,
+    },
+    modalHeader: {
+        marginBottom: 12,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    modalText: {
+        fontSize: 15,
+        textAlign: 'center',
+    },
+    modalButtonRow: {
+        flexDirection: 'row',
+        marginTop: 16,
+        gap: 10,
+    },
+    modalButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        backgroundColor: '#e11d48',
+    },
+    modalButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
     },
 });

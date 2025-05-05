@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider, useTheme } from '@/src/context/ThemeContext';
 import { usePathname } from 'expo-router';
 import '@/src/config/i18n';
+import Toast from 'react-native-toast-message';
 
 function StatusBarWithTheme() {
   const { theme } = useTheme();
@@ -30,6 +31,7 @@ export default function RootLayout() {
         <Stack.Screen name="RandevuScreen" options={{ headerShown: false, presentation: 'card' }} />
         <Stack.Screen name="EditAppointmentScreen" options={{ headerShown: false, presentation: 'card' }} />
       </Stack>
+      <Toast /> 
     </ThemeProvider>
   );
 }

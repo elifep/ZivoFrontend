@@ -8,6 +8,7 @@ export const mockAppointments = [
         price: 350,
         start: '11:00',
         end: '11:30',
+        status: 'active'
     },
     {
         id: '2',
@@ -18,6 +19,7 @@ export const mockAppointments = [
         price: 350,
         start: '11:30',
         end: '12:00',
+        status: 'active'
     },
     {
         id: '3',
@@ -28,6 +30,7 @@ export const mockAppointments = [
         price: 350,
         start: '12:00',
         end: '12:30',
+        status: 'active'
     },
     {
         id: '4',
@@ -38,5 +41,6 @@ export const mockAppointments = [
         price: 400,
         start: '10:00',
         end: '11:00',
+        status: 'cancelled'
     },
-];  
+] as const;  
