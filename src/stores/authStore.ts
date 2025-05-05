@@ -1,4 +1,6 @@
+// src/stores/authStore.ts
 import { create } from 'zustand';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as authService from '@/src/services/authService';
 
 interface User {
@@ -12,39 +14,66 @@ interface AuthState {
     refreshToken: string | null;
     login: (email: string, password: string) => Promise<void>;
     register: (email: string, password: string) => Promise<void>;
-    logout: () => void;
+    logout: () => Promise<void>;
+    loadTokens: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
     user: null,
-    accessToken: typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null,
-    refreshToken: typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null,
+    accessToken: null,
+    refreshToken: null,
 
     login: async (email, password) => {
-        const data = await authService.loginUser(email, password);
+        const data = await authService.loginUser(email.trim(), password.trim());
         set({
             user: data.user,
             accessToken: data.accessToken,
             refreshToken: data.refreshToken,
         });
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
-    },
 
-    register: async (email, password) => {
-        const data = await authService.registerUser(email, password);
+        await AsyncStorage.setItem('accessToken', data.accessToken);
+        await AsyncStorage.setItem('refreshToken', data.refreshToken);
         set({
-            user: { email, role: 'user' },
+            user: data.user ?? null,
             accessToken: data.accessToken,
             refreshToken: data.refreshToken,
         });
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
+
+        if (data.user) {
+            await AsyncStorage.setItem('user', JSON.stringify(data.user));
+        }
     },
 
-    logout: () => {
+    register: async (email, password) => {
+        const data = await authService.registerUser(email.trim(), password.trim());
+        const user = { email, role: 'user' };
+        set({
+            user,
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken,
+        });
+
+        await AsyncStorage.setItem('accessToken', data.accessToken);
+        await AsyncStorage.setItem('refreshToken', data.refreshToken);
+        await AsyncStorage.setItem('user', JSON.stringify(user));
+    },
+
+    logout: async () => {
         set({ user: null, accessToken: null, refreshToken: null });
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'user']);
+    },
+
+    loadTokens: async () => {
+        const [accessToken, refreshToken, user] = await Promise.all([
+            AsyncStorage.getItem('accessToken'),
+            AsyncStorage.getItem('refreshToken'),
+            AsyncStorage.getItem('user'),
+        ]);
+
+        set({
+            accessToken,
+            refreshToken,
+            user: user ? JSON.parse(user) : null,
+        });
     },
 }));
