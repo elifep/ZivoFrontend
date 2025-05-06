@@ -26,12 +26,13 @@ export default function RootLayout() {
     <ThemeProvider>
       <StatusBarWithTheme />
       <Stack>
+        <Stack.Screen name='auth' options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="SalonDetailScreen" options={{ headerShown: false, presentation: 'card' }} />
         <Stack.Screen name="RandevuScreen" options={{ headerShown: false, presentation: 'card' }} />
         <Stack.Screen name="EditAppointmentScreen" options={{ headerShown: false, presentation: 'card' }} />
       </Stack>
-      <Toast /> 
+      <Toast />
     </ThemeProvider>
   );
 }

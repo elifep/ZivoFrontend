@@ -64,6 +64,7 @@ export default function LoginScreen() {
         // }
     };
     return (
+        <View style={{ flex: 1, backgroundColor: '#fff' ,paddingTop: 70, alignContent: 'center'}}>
         <ScrollView contentContainerStyle={styles.container}>
             {/* Logo */}
             <Image
@@ -119,6 +120,7 @@ export default function LoginScreen() {
             {/* Dil ve Ülke */}
             <LanguageSelector />
         </ScrollView>
+        </View>
     );
 }
 const styles = StyleSheet.create({

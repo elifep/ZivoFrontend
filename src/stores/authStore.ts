@@ -16,9 +16,10 @@ interface AuthState {
     register: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     loadTokens: () => Promise<void>;
+    getAccessToken: () => Promise<string | null>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
     user: null,
     accessToken: null,
     refreshToken: null,
@@ -76,4 +77,11 @@ export const useAuthStore = create<AuthState>((set) => ({
             user: user ? JSON.parse(user) : null,
         });
     },
+    getAccessToken: async () => {
+        const accessToken = get().accessToken;
+        if (accessToken) return accessToken;
+        const storedToken = await AsyncStorage.getItem('accessToken');
+        if (storedToken) set({ accessToken: storedToken });
+        return storedToken;
+    }
 }));

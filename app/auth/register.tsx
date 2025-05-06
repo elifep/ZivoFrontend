@@ -50,60 +50,62 @@ export default function RegisterScreen() {
                 text1: 'Kayıt başarısız',
                 text2: error.message,
             });
-        }   
+        }
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            {/* Logo */}
-            <Image
-                source={require('@/assets/zivo.png')}
-                style={{ width: 450, height: 200, resizeMode: 'contain', alignSelf: 'center', marginBottom: 24 }}
-            />
+        <View style={{ flex: 1, backgroundColor: '#fff', paddingTop: 70, alignContent: 'center' }}>
+            <ScrollView contentContainerStyle={styles.container}>
+                {/* Logo */}
+                <Image
+                    source={require('@/assets/zivo.png')}
+                    style={{ width: 450, height: 200, resizeMode: 'contain', alignSelf: 'center', marginBottom: 24 }}
+                />
 
-            {/* Başlık */}
-            <Text style={{ fontSize: 36, fontWeight: 'bold', marginBottom: 6 }}>{t('auth.welcome')}</Text>
-            <Text style={{ fontSize: 28, fontWeight: '500', marginBottom: 20 }}>{t('auth.register')}</Text>
+                {/* Başlık */}
+                <Text style={{ fontSize: 36, fontWeight: 'bold', marginBottom: 6 }}>{t('auth.welcome')}</Text>
+                <Text style={{ fontSize: 28, fontWeight: '500', marginBottom: 20 }}>{t('auth.register')}</Text>
 
-            {/* Form */}
-            <Text style={styles.label}>E-Mail:</Text>
-            <TextInput
-                style={styles.input}
-                placeholder={t('auth.emailPlaceholder')}
-                value={email}
-                onChangeText={setEmail}
-                placeholderTextColor="#999"
-            />
+                {/* Form */}
+                <Text style={styles.label}>E-Mail:</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder={t('auth.emailPlaceholder')}
+                    value={email}
+                    onChangeText={setEmail}
+                    placeholderTextColor="#999"
+                />
 
-            <Text style={styles.label}>{t('auth.password')}:</Text>
-            <TextInput
-                style={styles.input}
-                placeholder={t('auth.passwordPlaceholder')}
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-                placeholderTextColor="#999"
-            />
+                <Text style={styles.label}>{t('auth.password')}:</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder={t('auth.passwordPlaceholder')}
+                    secureTextEntry
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholderTextColor="#999"
+                />
 
-            <Text style={styles.label}>{t('auth.confirmPassword')}:</Text>
-            <TextInput
-                style={styles.input}
-                placeholder={t('auth.confirmPasswordPlaceholder')}
-                secureTextEntry
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                placeholderTextColor="#999"
-            />
+                <Text style={styles.label}>{t('auth.confirmPassword')}:</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder={t('auth.confirmPasswordPlaceholder')}
+                    secureTextEntry
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    placeholderTextColor="#999"
+                />
 
-            {error !== '' && <Text style={styles.error}>{error}</Text>}
+                {error !== '' && <Text style={styles.error}>{error}</Text>}
 
-            <TouchableOpacity style={styles.loginBtn} onPress={handleRegister}>
-                <Text style={styles.loginBtnText}>{t('auth.register')}</Text>
-            </TouchableOpacity>
+                <TouchableOpacity style={styles.loginBtn} onPress={handleRegister}>
+                    <Text style={styles.loginBtnText}>{t('auth.register')}</Text>
+                </TouchableOpacity>
 
-            {/* Dil ve Ülke */}
-            <LanguageSelector />
-        </ScrollView>
+                {/* Dil ve Ülke */}
+                <LanguageSelector />
+            </ScrollView>
+        </View>
     );
 }
 

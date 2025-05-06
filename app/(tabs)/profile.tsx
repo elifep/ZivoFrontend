@@ -1,4 +1,5 @@
-import { View, Button, Text, Platform, Alert, TextInput, TouchableOpacity, ScrollView, StyleSheet, Image } from 'react-native';
+// src/app/(tabs)/profil.tsx
+import { View, Button, Text, Alert, TextInput, TouchableOpacity, ScrollView, StyleSheet, Image, Platform } from 'react-native';
 import { useState, useEffect } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { useProfileStore } from '@/src/stores/profileStore';
@@ -11,15 +12,16 @@ import { useAppTheme } from '@/src/hooks/useAppTheme';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import moment from 'moment';
 
 export default function ProfilimScreen() {
     const { colors } = useAppTheme();
-    const token = useAuthStore((s) => s.accessToken);
     const { profile, fetchProfile, updateProfile } = useProfileStore();
-    const [showDatePicker, setShowDatePicker] = useState(false);
     const logout = useAuthStore((state) => state.logout);
     const router = useRouter();
 
+    const [showDatePicker, setShowDatePicker] = useState(false);
     const [form, setForm] = useState({
         full_name: '',
         phone: '',
@@ -30,8 +32,12 @@ export default function ProfilimScreen() {
     });
 
     useEffect(() => {
-        if (token) fetchProfile(token);
-    }, [token]);
+        fetchProfile().then(() => {
+            console.log('Profil çekildi:', useProfileStore.getState().profile);
+        }).catch((err) => {
+            Toast.show({ type: 'error', text1: 'Profil yüklenemedi', text2: err.message });
+        });
+    }, []);
 
     useEffect(() => {
         if (profile) {
@@ -45,11 +51,13 @@ export default function ProfilimScreen() {
             });
         }
     }, [profile]);
+
     const handleLogout = async () => {
         await logout();
         Alert.alert('Çıkış Yapıldı');
-        router.replace('/auth/login'); // Yönlendir
+        router.replace('/auth/login');
     };
+
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -71,7 +79,7 @@ export default function ProfilimScreen() {
 
     const handleSave = async () => {
         try {
-            await updateProfile(form, token!);
+            await updateProfile(form);
             Toast.show({ type: 'success', text1: 'Profil güncellendi' });
         } catch (err: any) {
             Toast.show({ type: 'error', text1: 'Hata', text2: err.message });
@@ -79,7 +87,7 @@ export default function ProfilimScreen() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
             <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.background }]}>
                 <Text style={[styles.title, { color: colors.text }]}>Profilim</Text>
 
@@ -87,11 +95,10 @@ export default function ProfilimScreen() {
                     {form.image ? (
                         <Image source={{ uri: form.image.uri }} style={styles.image} />
                     ) : profile?.image_url ? (
-                        <Image source={{ uri: `http://localhost:5000/${profile.image_url}` }} style={styles.image} />
+                        <Image source={{ uri: `http://10.0.2.2:5000/${profile.image_url}` }} style={styles.image} />
                     ) : (
                         <Ionicons name="person-circle-outline" size={120} color={colors.icon} />
                     )}
-
                     <TouchableOpacity onPress={pickImage} style={[styles.pickBtn, { backgroundColor: colors.primary }]}>
                         <Text style={{ color: colors.buttonText }}>Fotoğrafı Değiştir</Text>
                     </TouchableOpacity>
@@ -114,7 +121,7 @@ export default function ProfilimScreen() {
                 />
                 <TouchableOpacity onPress={() => setShowDatePicker(true)} style={[styles.input, { borderColor: colors.border }]}>
                     <Text style={{ color: form.birthday ? colors.text : colors.mutedText }}>
-                        {form.birthday || 'Doğum Tarihi Seç'}
+                        {form.birthday ? moment(form.birthday).format('DD.MM.YYYY') : 'Doğum Tarihi Seç'}
                     </Text>
                 </TouchableOpacity>
 
@@ -126,14 +133,14 @@ export default function ProfilimScreen() {
                         onChange={(event, selectedDate) => {
                             setShowDatePicker(false);
                             if (selectedDate) {
-                                const dateString = selectedDate.toISOString().split('T')[0]; // YYYY-MM-DD
+                                const dateString = selectedDate.toISOString().split('T')[0];
                                 setForm((f) => ({ ...f, birthday: dateString }));
                             }
                         }}
                     />
                 )}
 
-                <View style={[styles.input, { padding: 0 }]}>
+                <View style={[styles.input, { borderColor: colors.border }, { padding: 0 }]}>
                     <Picker
                         selectedValue={form.gender}
                         onValueChange={(itemValue) => setForm((f) => ({ ...f, gender: itemValue }))}
@@ -164,11 +171,12 @@ export default function ProfilimScreen() {
 
                 <Text style={[styles.sectionTitle, { color: colors.icon }]}>Dil Seçimi</Text>
                 <LanguagePicker />
+
                 <View style={{ marginTop: 20 }}>
                     <Button title="Çıkış Yap" onPress={handleLogout} color="#e53935" />
                 </View>
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 }
 

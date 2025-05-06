@@ -1,6 +1,6 @@
 // src/stores/profileStore.ts
 import { create } from 'zustand';
-import { getMyProfile, updateMyProfile, ProfileFormValues } from '../services/profileApi';
+import { getMyProfile, updateMyProfile, ProfileFormValues } from '@/src/services/profileApi';
 
 interface Profile {
     profileId: string;
@@ -15,20 +15,20 @@ interface Profile {
 
 interface ProfileStore {
     profile: Profile | null;
-    fetchProfile: (token: string) => Promise<void>;
-    updateProfile: (data: ProfileFormValues, token: string) => Promise<void>;
+    fetchProfile: () => Promise<void>;
+    updateProfile: (data: ProfileFormValues) => Promise<void>;
 }
 
 export const useProfileStore = create<ProfileStore>((set) => ({
     profile: null,
 
-    fetchProfile: async (token) => {
-        const profile = await getMyProfile(token);
+    fetchProfile: async () => {
+        const profile = await getMyProfile();
         set({ profile });
     },
 
-    updateProfile: async (data, token) => {
-        const updated = await updateMyProfile(data, token);
+    updateProfile: async (data) => {
+        const updated = await updateMyProfile(data);
         set({ profile: updated });
     },
 }));
