@@ -26,14 +26,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     login: async (email, password) => {
         const data = await authService.loginUser(email.trim(), password.trim());
+        console.log('Login response:', data);
         set({
             user: data.user,
             accessToken: data.accessToken,
             refreshToken: data.refreshToken,
         });
-
+        console.log(data.user);
         await AsyncStorage.setItem('accessToken', data.accessToken);
         await AsyncStorage.setItem('refreshToken', data.refreshToken);
+        await AsyncStorage.setItem('user', JSON.stringify(data.user));
         set({
             user: data.user ?? null,
             accessToken: data.accessToken,

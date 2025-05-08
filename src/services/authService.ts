@@ -4,6 +4,7 @@ import { API_URL } from '@/src/config/config';
 const BASE_URL = API_URL;
 
 export const loginUser = async (email: string, password: string) => {
+    console.log(`${BASE_URL}/auth/login`)
     const response = await fetch(`${BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
@@ -26,7 +27,7 @@ export const registerUser = async (email: string, password: string) => {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, role: 'user' }), // 👈 ekledik
     });
 
     if (!response.ok) {
