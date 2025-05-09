@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import SalonCard from '@/src/components/SalonCard';
-import { useAppTheme } from '@/src/hooks/useAppTheme';
-import { getAllSalons } from '@/src/services/salonService';
+import SalonCard from '@/components/SalonCard';
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { getAllSalons } from '@/services/salonService';
 import { useTranslation } from 'react-i18next';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';

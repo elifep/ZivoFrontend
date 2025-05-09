@@ -2,10 +2,10 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView 
 import { FontAwesome } from '@expo/vector-icons';
 import { useState } from 'react';
 import { router } from 'expo-router';
-import LanguageSelector from '@/src/components/LanguageSelector';
+import LanguageSelector from '@/components/LanguageSelector';
 import { useTranslation } from 'react-i18next';
 import Toast from 'react-native-toast-message';
-import { useAuthStore } from '@/src/stores/authStore';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function LoginScreen() {
     const { t } = useTranslation();
@@ -68,7 +68,7 @@ export default function LoginScreen() {
         <ScrollView contentContainerStyle={styles.container}>
             {/* Logo */}
             <Image
-                source={require('@/assets/zivo.png')}
+                source={require('../../assets/zivo.png')}
                 style={{
                     width: 450,          // ✅ genişlik ayarlandı
                     height: 200,          // ✅ yükseklik ayarlandı

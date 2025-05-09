@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { useAppTheme } from '@/src/hooks/useAppTheme';
+import { useAppTheme } from '@/hooks/useAppTheme';
 
 export default function FilterRow() {
     const { colors } = useAppTheme();

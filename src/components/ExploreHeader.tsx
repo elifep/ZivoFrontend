@@ -1,7 +1,6 @@
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { useAppTheme } from '@/src/hooks/useAppTheme';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAppTheme } from '@/hooks/useAppTheme';
 
 interface Props {
     selected: string;

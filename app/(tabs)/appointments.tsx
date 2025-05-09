@@ -1,14 +1,14 @@
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Modal, ActivityIndicator } from 'react-native';
-import { useAppTheme } from '@/src/hooks/useAppTheme';
-import { mockAppointments } from '@/src/data/appointments';
+import { useAppTheme } from '@/hooks/useAppTheme';
+import { mockAppointments } from '@/data/appointments';
 import { Calendar } from 'react-native-calendars';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect } from 'react';
 import { LocaleConfig } from 'react-native-calendars';
 import { useTranslation } from 'react-i18next';
-import { setupCalendarLocales } from '@/src/config/calendarLocales';
-import { formatDate } from '@/src/config/date';
+import { setupCalendarLocales } from '@/config/calendarLocales';
+import { formatDate } from '@/config/date';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { format } from 'date-fns'; // en üstte

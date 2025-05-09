@@ -3,9 +3,9 @@ import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 const languages = [
-    { code: 'tr', label: 'Türkçe', flag: require('@/assets/flags/tr.png') },
-    { code: 'en', label: 'English', flag: require('@/assets/flags/gb.png') },
-    { code: 'ar', label: 'العربية', flag: require('@/assets/flags/sa.png') },
+    { code: 'tr', label: 'Türkçe', flag: require('../../assets/flags/tr.png') },
+    { code: 'en', label: 'English', flag: require('../../assets/flags/gb.png') },
+    { code: 'ar', label: 'العربية', flag: require('../../assets/flags/sa.png') },
 ];
 
 export default function LanguageSelector() {

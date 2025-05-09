@@ -9,7 +9,7 @@ export const campaignSalons = [
         discount: '10%',
         mostLiked: true, // 👈 bu eklendi
         category: 'Saç Hizmetleri',
-        image: require('@/assets/images/salons/rose-life-nisantasi.jpg'),
+        image: require('../../assets/images/salons/rose-life-nisantasi.jpg'),
     },
     {
         id: '2',
@@ -20,7 +20,7 @@ export const campaignSalons = [
         discount: '15%',
         mostLiked: false,
         category: 'Saç Hizmetleri',
-        image: require('@/assets/images/salons/blink-saasy.jpg'),
+        image: require('../../assets/images/salons/blink-saasy.jpg'),
     },
     {
         id: '3',
@@ -31,7 +31,7 @@ export const campaignSalons = [
         discount: '10%',
         mostLiked: true,
         category: 'Cilt Bakımı',
-        image: require('@/assets/images/salons/cilt.jpg'),
+        image: require('../../assets/images/salons/cilt.jpg'),
     },
 ];
 
@@ -44,6 +44,6 @@ export const allSalons = [
         rating: 5.0,
         liked: false,
         category: 'Tırnak Hizmetleri',
-        image: require('@/assets/images/salons/x-guzellik-salonu.jpg'),
+        image: require('../../assets/images/salons/x-guzellik-salonu.jpg'),
     },
 ];  

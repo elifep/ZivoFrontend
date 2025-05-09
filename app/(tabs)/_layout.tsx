@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
-import { useAppTheme } from '@/src/hooks/useAppTheme';
+import { useAppTheme } from '@/hooks/useAppTheme';
 import { useTranslation } from 'react-i18next';
 
 export default function TabLayout() {

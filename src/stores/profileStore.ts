@@ -1,6 +1,6 @@
 // src/stores/profileStore.ts
 import { create } from 'zustand';
-import { getMyProfile, updateMyProfile, ProfileFormValues } from '@/src/services/profileApi';
+import { getMyProfile, updateMyProfile, ProfileFormValues } from '@/services/profileApi';
 
 interface Profile {
     profileId: string;

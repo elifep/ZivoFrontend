@@ -1,8 +1,8 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ThemeProvider, useTheme } from '@/src/context/ThemeContext';
+import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 import { usePathname } from 'expo-router';
-import '@/src/config/i18n';
+import '@/config/i18n';
 import Toast from 'react-native-toast-message';
 
 function StatusBarWithTheme() {

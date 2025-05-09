@@ -1,4 +1,4 @@
-import { allSalons, campaignSalons } from '@/src/data/salons';
+import { allSalons, campaignSalons } from '@/data/salons';
 
 export const getCampaignSalons = async () => {
     return campaignSalons;

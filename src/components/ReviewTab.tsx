@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAppTheme } from '@/src/hooks/useAppTheme';
+import { useAppTheme } from '@/hooks/useAppTheme';
 
 const reviews = [
     { id: '1', name: 'Beyza Eprimez', rating: 3, date: '12.05.2024, 10:10', comment: 'Beklediğim kadar güzel değildi ama iyiydi. 3 yıldızı hak etti.' },

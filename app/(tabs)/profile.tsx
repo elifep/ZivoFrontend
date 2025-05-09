@@ -2,13 +2,13 @@
 import { View, Button, Text, Alert, TextInput, TouchableOpacity, ScrollView, StyleSheet, Image, Platform } from 'react-native';
 import { useState, useEffect } from 'react';
 import * as ImagePicker from 'expo-image-picker';
-import { useProfileStore } from '@/src/stores/profileStore';
-import { useAuthStore } from '@/src/stores/authStore';
+import { useProfileStore } from '@/stores/profileStore';
+import { useAuthStore } from '@/stores/authStore';
 import Toast from 'react-native-toast-message';
-import ThemePicker from '@/src/components/ThemePicker';
-import LanguagePicker from '@/src/components/LanguagePicker';
+import ThemePicker from '@/components/ThemePicker';
+import LanguagePicker from '@/components/LanguagePicker';
 import { Ionicons } from '@expo/vector-icons';
-import { useAppTheme } from '@/src/hooks/useAppTheme';
+import { useAppTheme } from '@/hooks/useAppTheme';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';

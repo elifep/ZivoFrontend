@@ -2,10 +2,10 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, TextInput, StatusBar } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { useState } from 'react';
-import ReviewTab from '@/src/components/ReviewTab'; // 📌 Yorumlar için komponent import edildi
-import PortfolioTab from '@/src/components/PortfolioTab'; // 📌 Görseller için komponent import edildi
-import SalonDetailsTab from '@/src/components/SalonDetailsTab'; // doğru path'e göre ayarla
-import { useAppTheme } from '@/src/hooks/useAppTheme';
+import ReviewTab from '@/components/ReviewTab'; // 📌 Yorumlar için komponent import edildi
+import PortfolioTab from '@/components/PortfolioTab'; // 📌 Görseller için komponent import edildi
+import SalonDetailsTab from '@/components/SalonDetailsTab'; // doğru path'e göre ayarla
+import { useAppTheme } from '@/hooks/useAppTheme';
 
 interface Service {
     name: string;

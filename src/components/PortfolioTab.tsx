@@ -2,13 +2,13 @@
 import { useState } from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAppTheme } from '@/src/hooks/useAppTheme';
+import { useAppTheme } from '@/hooks/useAppTheme';
 import { ImageSourcePropType } from 'react-native';
 
 const portfolioItems = [
-    { id: '1', image: require('@/assets/portfolio/1.png'), likes: 3, comments: 3 },
-    { id: '2', image: require('@/assets/portfolio/2.png'), likes: 0, comments: 0 },
-    { id: '3', image: require('@/assets/portfolio/3.png'), likes: 0, comments: 0 },
+    { id: '1', image: require('../../assets/portfolio/1.png'), likes: 3, comments: 3 },
+    { id: '2', image: require('../../assets/portfolio/2.png'), likes: 0, comments: 0 },
+    { id: '3', image: require('../../assets/portfolio/3.png'), likes: 0, comments: 0 },
 ];
 
 const mockComments = [

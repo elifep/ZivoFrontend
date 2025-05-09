@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons, Feather, Entypo } from '@expo/vector-icons';
-import { useAppTheme } from '@/src/hooks/useAppTheme';
+import { useAppTheme } from '@/hooks/useAppTheme';
 import { Linking } from 'react-native';
 
 export default function SalonDetailsTab() {
@@ -21,9 +21,9 @@ export default function SalonDetailsTab() {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             {/* Harita ve Bilgi Kutusu */}
             <View style={[styles.mapBox, { backgroundColor: colors.card }]}>
-                <Image source={require('@/assets/map-snapshot.png')} style={styles.mapImage} />
+                <Image source={require('../../assets/map-snapshot.png')} style={styles.mapImage} />
                 <View style={styles.mapInfo}>
-                    <Image source={require('@/assets/images/salons/rose-life-nisantasi.jpg')} style={styles.avatar} />
+                    <Image source={require('../../assets/images/salons/rose-life-nisantasi.jpg')} style={styles.avatar} />
                     <View style={{ flex: 1 }}>
                         <Text style={[styles.salonName, { color: colors.text }]}>Rose Life Nişantaşı</Text>
                         <Text style={[styles.salonAddress, { color: colors.text }]}>34920 Vadi İstanbul Avrupa Yakası...</Text>

@@ -1,7 +1,7 @@
 // src/stores/authStore.ts
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as authService from '@/src/services/authService';
+import * as authService from '@/services/authService';
 
 interface User {
     email: string;

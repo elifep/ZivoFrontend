@@ -1,10 +1,10 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert } from 'react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import LanguageSelector from '@/src/components/LanguageSelector';
+import LanguageSelector from '@/components/LanguageSelector';
 import { router } from 'expo-router';
 import Toast from 'react-native-toast-message';
-import { useAuthStore } from '@/src/stores/authStore';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function RegisterScreen() {
     const { t } = useTranslation();
@@ -58,7 +58,7 @@ export default function RegisterScreen() {
             <ScrollView contentContainerStyle={styles.container}>
                 {/* Logo */}
                 <Image
-                    source={require('@/assets/zivo.png')}
+                    source={require('../../assets/zivo.png')}
                     style={{ width: 450, height: 200, resizeMode: 'contain', alignSelf: 'center', marginBottom: 24 }}
                 />
 

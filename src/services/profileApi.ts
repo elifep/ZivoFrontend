@@ -1,6 +1,6 @@
 // src/services/profileApi.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL } from '@/src/config/config';
+import { API_URL } from '@/config/config';
 
 const BASE_URL = API_URL;
 

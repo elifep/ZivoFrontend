@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { useAppTheme } from '@/src/hooks/useAppTheme';
+import { useAppTheme } from '@/hooks/useAppTheme';
 
 export default function ThemePicker() {
     const { theme, setTheme, colors } = useAppTheme();
