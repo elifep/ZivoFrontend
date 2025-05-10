@@ -1,17 +1,15 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { Feather, FontAwesome } from '@expo/vector-icons';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { API_URL } from '@/config/config';
 
 interface Props {
   image_url: string;
   businessName: string;
   address: string;
   liked?: boolean;
-  discount?: string;
   fullWidth?: boolean;
   onToggleLike?: () => void;
-  mostLiked?: boolean;
-  isCampaign?: boolean;
 }
 
 export default function SalonCard({
@@ -19,11 +17,8 @@ export default function SalonCard({
   businessName,
   address,
   liked,
-  discount,
   fullWidth,
   onToggleLike,
-  mostLiked,
-  isCampaign,
 }: Props) {
   const { colors } = useAppTheme();
   const screenWidth = Dimensions.get('window').width;
@@ -34,13 +29,17 @@ export default function SalonCard({
     fullWidth && { width: screenWidth - 32, marginRight: 0 },
   ];
 
+  const imageSource = image_url?.startsWith('http')
+    ? image_url
+    : `${API_URL}/${image_url}`;
+
   return (
     <View style={cardStyle}>
       <View style={styles.imageWrapper}>
         {image_url ? (
-          <Image source={{ uri: image_url }} style={styles.image} />
+          <Image source={{ uri: imageSource }} style={styles.image} />
         ) : (
-          <View style={[styles.image, { backgroundColor: '#ccc', justifyContent: 'center', alignItems: 'center' }]}>
+          <View style={[styles.image, styles.imageFallback]}>
             <Text style={{ color: '#000' }}>Resim Yok</Text>
           </View>
         )}
@@ -58,7 +57,7 @@ export default function SalonCard({
 
         <View style={[styles.ratingTopRight, { backgroundColor: colors.background }]}>
           <Feather name="star" size={14} color={colors.text} />
-          <Text style={[styles.ratingText, { color: colors.text }]}>5.0</Text> {/* Şimdilik sabit */}
+          <Text style={[styles.ratingText, { color: colors.text }]}>5.0</Text>
         </View>
       </View>
 
@@ -85,6 +84,11 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 160,
+  },
+  imageFallback: {
+    backgroundColor: '#ccc',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   heart: {
     position: 'absolute',

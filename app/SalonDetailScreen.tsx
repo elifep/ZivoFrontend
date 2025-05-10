@@ -6,37 +6,29 @@ import ReviewTab from '@/components/ReviewTab'; // 📌 Yorumlar için komponent
 import PortfolioTab from '@/components/PortfolioTab'; // 📌 Görseller için komponent import edildi
 import SalonDetailsTab from '@/components/SalonDetailsTab'; // doğru path'e göre ayarla
 import { useAppTheme } from '@/hooks/useAppTheme';
-
-interface Service {
-    name: string;
-    price: number;
-    duration: string;
-}
-
-const dummyServices: Service[] = [
-    { name: 'Manikür', price: 350, duration: '30 dk' },
-    { name: 'Kaş Alma', price: 120, duration: '15 dk' },
-    { name: 'Saç Kesimi', price: 450, duration: '30 dk' },
-    { name: 'Pedikür', price: 350, duration: '30 dk' },
-    { name: 'Cilt Bakımı', price: 700, duration: '60 dk' },
-    { name: 'İpek Kirpik', price: 1000, duration: '45 dk' },
-    { name: 'Kirpik Lifting', price: 400, duration: '30 dk' },
-];
+import { API_URL } from '@/config/config';
+import { useServiceStore } from '@/stores/serviceStore';
+import { useEffect } from 'react';
 
 export default function SalonDetailScreen() {
     const { colors, isDark } = useAppTheme();
     const router = useRouter();
     const { salon } = useLocalSearchParams();
     const salonData = JSON.parse(salon as string);
-
     const [isLiked, setIsLiked] = useState(salonData.liked);
+    const { services, fetchServices, loading } = useServiceStore();
+
     const [selectedTab, setSelectedTab] = useState('Hizmetler');
     const [searchTerm, setSearchTerm] = useState('');
 
-    const filteredServices = dummyServices.filter(service =>
-        service.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
+    // const filteredServices = dummyServices.filter(service =>
+    //     service.name.toLowerCase().includes(searchTerm.toLowerCase())
+    // );
+    useEffect(() => {
+        if (salonData?.businessId) {
+            fetchServices(salonData.businessId);
+        }
+    }, [salonData?.businessId]);
     return (
         <View style={{ flex: 1, backgroundColor: colors.background }}>
             <StatusBar
@@ -46,7 +38,16 @@ export default function SalonDetailScreen() {
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
                 {/* Salon Görseli */}
                 <View style={styles.imageContainer}>
-                    <Image source={salonData.image} style={[styles.salonImage, { backgroundColor: colors.background }]} />
+                    {salonData.image_url ? (
+                        <Image
+                            source={{ uri: salonData.image_url.startsWith('http') ? salonData.image_url : `${API_URL}/${salonData.image_url}` }}
+                            style={[styles.salonImage, { backgroundColor: colors.background }]}
+                        />
+                    ) : (
+                        <View style={[styles.salonImage, { backgroundColor: '#ccc', justifyContent: 'center', alignItems: 'center' }]}>
+                            <Text style={{ color: '#000' }}>Fotoğraf Yok</Text>
+                        </View>
+                    )}
 
                     {/* Geri Dön Butonu */}
                     <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
@@ -56,7 +57,7 @@ export default function SalonDetailScreen() {
                     {/* Puan Kutusu */}
                     <View style={styles.starBox}>
                         <Ionicons name="star-outline" size={16} color="#000" />
-                        <Text style={styles.starBoxText}>{salonData.rating.toFixed(1)}</Text>
+                        <Text style={styles.starBoxText}>eee</Text>
                     </View>
 
                     {/* Siyah Bilgi Alanı (Resmin Üstünde) */}
@@ -100,7 +101,14 @@ export default function SalonDetailScreen() {
                             value={searchTerm}
                             onChangeText={setSearchTerm}
                         />
-                        {filteredServices.map((service, index) => (
+                        {services.map((service) => (
+                            <View key={service.servicesid}>
+                                <Text>{service.name}</Text>
+                                <Text>{service.price} ₺</Text>
+                                <Text>{service.duration_min} dk</Text>
+                            </View>
+                        ))}
+                        {/* {filteredServices.map((service, index) => (
                             <View key={index} style={[styles.serviceRow, { borderBottomColor: colors.borderBottom }]}>
                                 <Text style={[styles.serviceName, { color: colors.text }]}>{service.name}</Text>
                                 <View style={styles.serviceRight}>
@@ -115,7 +123,7 @@ export default function SalonDetailScreen() {
                                     </TouchableOpacity>
                                 </View>
                             </View>
-                        ))}
+                        ))} */}
                     </View>
                 )}
 
