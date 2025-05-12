@@ -72,5 +72,28 @@
     "loginSuccess": "Hoş geldiniz!",
     "loginErrorTitle": "Giriş Başarısız",
     "loginError": "E-posta veya şifre hatalı."
+  },
+  "salonDetail": {
+    "tabs": {
+      "services": "Hizmetler",
+      "reviews": "Yorumlar",
+      "portfolio": "Portföy",
+      "details": "Detaylar"
+    },
+    "searchPlaceholder": "Hizmet arayın...",
+    "bookButton": "Randevu Al"
+  },
+  "explore": {
+    "title": "Tüm Salonlar",
+    "noSalons": "Salon bulunamadı.",
+    "searchPlaceholder": "Hizmet veya işletme adını arayın",
+    "location": "Nereye?",
+    "date": "Ne Zaman?",
+    "categories": {
+      "all": "Hepsi",
+      "hair": "Saç Hizmetleri",
+      "nail": "Tırnak Hizmetleri",
+      "skin": "Cilt Bakımı"
+    }
   }
 }

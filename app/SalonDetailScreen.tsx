@@ -9,21 +9,23 @@ import { useAppTheme } from '@/hooks/useAppTheme';
 import { API_URL } from '@/config/config';
 import { useServiceStore } from '@/stores/serviceStore';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function SalonDetailScreen() {
     const { colors, isDark } = useAppTheme();
+    const { t } = useTranslation();
     const router = useRouter();
     const { salon } = useLocalSearchParams();
     const salonData = JSON.parse(salon as string);
     const [isLiked, setIsLiked] = useState(salonData.liked);
     const { services, fetchServices, loading } = useServiceStore();
 
-    const [selectedTab, setSelectedTab] = useState('Hizmetler');
+    const [selectedTab, setSelectedTab] = useState(t('salonDetail.tabs.services'));
     const [searchTerm, setSearchTerm] = useState('');
 
-    // const filteredServices = dummyServices.filter(service =>
-    //     service.name.toLowerCase().includes(searchTerm.toLowerCase())
-    // );
+    const servicesFilter = services.filter(service =>
+        service.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );//hizmetleri filtreleme
     useEffect(() => {
         if (salonData?.businessId) {
             fetchServices(salonData.businessId);
@@ -56,14 +58,14 @@ export default function SalonDetailScreen() {
 
                     {/* Puan Kutusu */}
                     <View style={styles.starBox}>
-                        <Ionicons name="star-outline" size={16} color="#000" />
-                        <Text style={styles.starBoxText}>eee</Text>
+                        <Ionicons name="star" size={16} color="#F7C429" />
+                        <Text style={styles.starBoxText}>5.0</Text>
                     </View>
 
                     {/* Siyah Bilgi Alanı (Resmin Üstünde) */}
                     <View style={styles.salonInfoContainer}>
                         <View style={styles.salonTopRow}>
-                            <Text style={styles.salonName}>{salonData.name}</Text>
+                            <Text style={styles.salonName}>{salonData.businessName}</Text>
                             <View style={styles.rightIcons}>
                                 {salonData.discount && (
                                     <View style={styles.discountBadge}>
@@ -81,7 +83,10 @@ export default function SalonDetailScreen() {
 
                 {/* Sekmeler */}
                 <View style={[styles.tabContainer, { backgroundColor: colors.background }]}>
-                    {['Hizmetler', 'Yorumlar', 'Portföy', 'Detaylar'].map(tab => (
+                    {[t('salonDetail.tabs.services'),
+                    t('salonDetail.tabs.reviews'),
+                    t('salonDetail.tabs.portfolio'),
+                    t('salonDetail.tabs.details')].map(tab => (
                         <TouchableOpacity key={tab} onPress={() => setSelectedTab(tab)} style={styles.tabButton}>
                             <Text style={[styles.tabText, { color: colors.text }, selectedTab === tab && styles.activeTabText, selectedTab === tab && { color: colors.primary }]}>
                                 {tab}
@@ -92,50 +97,43 @@ export default function SalonDetailScreen() {
                 </View>
 
                 {/* İçerik */}
-                {selectedTab === 'Hizmetler' && (
+                {selectedTab === t('salonDetail.tabs.services') && (
                     <View style={[styles.servicesContainer, { backgroundColor: colors.background }]}>
                         <TextInput
-                            placeholder="Hizmet arayın..."
+                            placeholder={t('salonDetail.searchPlaceholder')}
                             placeholderTextColor="#888"
                             style={[styles.searchInput, { backgroundColor: colors.searchBackground }, { color: colors.text }]}
                             value={searchTerm}
                             onChangeText={setSearchTerm}
                         />
-                        {services.map((service) => (
-                            <View key={service.servicesid}>
-                                <Text>{service.name}</Text>
-                                <Text>{service.price} ₺</Text>
-                                <Text>{service.duration_min} dk</Text>
-                            </View>
-                        ))}
-                        {/* {filteredServices.map((service, index) => (
+                        {servicesFilter.map((service, index) => (
                             <View key={index} style={[styles.serviceRow, { borderBottomColor: colors.borderBottom }]}>
                                 <Text style={[styles.serviceName, { color: colors.text }]}>{service.name}</Text>
                                 <View style={styles.serviceRight}>
                                     <View style={{ alignItems: 'flex-end', marginRight: 8 }}>
                                         <Text style={[styles.priceText, { color: colors.text }]}>{service.price} ₺</Text>
-                                        <Text style={[styles.durationText, { color: colors.durationText }]}>{service.duration}</Text>
+                                        <Text style={[styles.durationText, { color: colors.durationText }]}>{service.duration_min}dk</Text>
                                     </View>
                                     <TouchableOpacity
                                         style={[styles.bookButton, { backgroundColor: colors.primary }]}
                                         onPress={() => router.push('/RandevuScreen')}>
-                                        <Text style={[styles.bookButtonText, { color: colors.background }]}>Randevu Al</Text>
+                                        <Text style={[styles.bookButtonText, { color: colors.background }]}>{t('salonDetail.bookButton')}</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
-                        ))} */}
+                        ))}
                     </View>
                 )}
 
-                {selectedTab === 'Yorumlar' && (
+                {selectedTab === t('salonDetail.tabs.reviews') && (
                     <ReviewTab />
                 )}
 
-                {selectedTab === 'Portföy' && (
+                {selectedTab === t('salonDetail.tabs.portfolio') && (
                     <PortfolioTab />
                 )}
 
-                {selectedTab === 'Detaylar' && (
+                {selectedTab === t('salonDetail.tabs.details') && (
                     <SalonDetailsTab />
                 )}
             </ScrollView>
@@ -164,7 +162,7 @@ const styles = StyleSheet.create({
     discountBadge: { backgroundColor: '#fff', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
     discountText: { fontSize: 12, fontWeight: 'bold', color: '#000' },
     salonAddress: { color: '#ccc', fontSize: 13, marginTop: 2 },
-    tabContainer: { flexDirection: 'row', paddingVertical: 8, borderBottomWidth: 1 },
+    tabContainer: { flexDirection: 'row', paddingVertical: 8},
     tabButton: { flex: 1, alignItems: 'center' },
     tabText: { fontSize: 14 },
     activeTabText: { fontWeight: 'bold' },

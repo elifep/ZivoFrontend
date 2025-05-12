@@ -6,13 +6,15 @@ import LanguageSelector from '@/components/LanguageSelector';
 import { useTranslation } from 'react-i18next';
 import Toast from 'react-native-toast-message';
 import { useAuthStore } from '@/stores/authStore';
+import { I18nManager } from 'react-native';
 
 export default function LoginScreen() {
     const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const isRTL = I18nManager.isRTL; // Yön tespiti
     const handleLogin = async () => {
-            if (!email || !password) {
+        if (!email || !password) {
             Toast.show({
                 type: 'error',
                 text1: t('toast.missingFieldsTitle'),
@@ -23,18 +25,18 @@ export default function LoginScreen() {
         try {
             await useAuthStore.getState().login(email, password);
             Toast.show({
-              type: 'success',
-              text1: t('toast.loginSuccessTitle'),
-              text2: t('toast.loginSuccess'),
+                type: 'success',
+                text1: t('toast.loginSuccessTitle'),
+                text2: t('toast.loginSuccess'),
             });
             router.replace('/(tabs)');
-          } catch (error: any) {
+        } catch (error: any) {
             Toast.show({
-              type: 'error',
-              text1: t('toast.loginErrorTitle'),
-              text2: t('toast.loginError'),
+                type: 'error',
+                text1: t('toast.loginErrorTitle'),
+                text2: t('toast.loginError'),
             });
-          }
+        }
 
         // // Örnek sabit giriş kontrolü
         // if (email === 'eee' && password === '12345') {
@@ -64,62 +66,62 @@ export default function LoginScreen() {
         // }
     };
     return (
-        <View style={{ flex: 1, backgroundColor: '#fff' ,paddingTop: 70, alignContent: 'center'}}>
-        <ScrollView contentContainerStyle={styles.container}>
-            {/* Logo */}
-            <Image
-                source={require('../../assets/zivo.png')}
-                style={{
-                    width: 450,          // ✅ genişlik ayarlandı
-                    height: 200,          // ✅ yükseklik ayarlandı
-                    resizeMode: 'contain',
-                    alignSelf: 'center', // ✅ ortalanmış konum
-                    marginBottom: 24,    // ✅ altındaki öğeyle mesafe
-                }} />
+        <View style={{ flex: 1, backgroundColor: '#fff', paddingTop: 70, alignContent: 'center' }}>
+            <ScrollView contentContainerStyle={styles.container}>
+                {/* Logo */}
+                <Image
+                    source={require('../../assets/zivo.png')}
+                    style={{
+                        width: 450,          // ✅ genişlik ayarlandı
+                        height: 200,          // ✅ yükseklik ayarlandı
+                        resizeMode: 'contain',
+                        alignSelf: 'center', // ✅ ortalanmış konum
+                        marginBottom: 24,    // ✅ altındaki öğeyle mesafe
+                    }} />
 
-            {/* Başlık */}
-            <Text style={{ fontSize: 36, fontWeight: 'bold', marginBottom: 6 }}>{t('auth.welcome')}</Text>
-            <Text style={{ fontSize: 28, fontWeight: '500', marginBottom: 20 }}>{t('auth.login')}</Text>
+                {/* Başlık */}
+                <Text style={{ fontSize: 36, fontWeight: 'bold', marginBottom: 6 }}>{t('auth.welcome')}</Text>
+                <Text style={{ fontSize: 28, fontWeight: '500', marginBottom: 20 }}>{t('auth.login')}</Text>
 
-            {/* Form */}
-            <TextInput style={styles.input} placeholder={t('auth.emailPlaceholder')} placeholderTextColor="#999" value={email}
-                onChangeText={setEmail} />
-            <TextInput style={styles.input} placeholder={t('auth.passwordPlaceholder')} secureTextEntry placeholderTextColor="#999" value={password}
-                onChangeText={setPassword} />
+                {/* Form */}
+                <TextInput style={[styles.input, { writingDirection: isRTL ? 'rtl' : 'ltr' }]}placeholder={t('auth.emailPlaceholder')} placeholderTextColor="#999" value={email}
+                    onChangeText={setEmail} />
+                <TextInput style={[styles.input, { writingDirection: isRTL ? 'rtl' : 'ltr' }]}placeholder={t('auth.passwordPlaceholder')} secureTextEntry placeholderTextColor="#999" value={password}
+                    onChangeText={setPassword} />
 
-            <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
-                <Text style={styles.loginBtnText}>{t('auth.login')}</Text>
-            </TouchableOpacity>
+                <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
+                    <Text style={styles.loginBtnText}>{t('auth.login')}</Text>
+                </TouchableOpacity>
 
-            <Text style={styles.registerText}>
-                {t('auth.noAccount')}<Text style={{ fontWeight: 'bold' }} onPress={() => router.push('/auth/register')}>{t('auth.createNow')}</Text>
-            </Text>
+                <Text style={styles.registerText}>
+                    {t('auth.noAccount')}<Text style={{ fontWeight: 'bold' }} onPress={() => router.push('/auth/register')}>{t('auth.createNow')}</Text>
+                </Text>
 
-            <Text style={styles.orText}>{t('auth.or')}</Text>
+                <Text style={styles.orText}>{t('auth.or')}</Text>
 
-            {/* Sosyal Giriş */}
-            {/* Apple */}
-            <TouchableOpacity style={styles.socialBtn}>
-                <FontAwesome name="apple" size={20} color="#000" style={{ marginRight: 10 }} />
-                <Text style={styles.socialText}>{t('auth.continueWithApple')}</Text>
-            </TouchableOpacity>
+                {/* Sosyal Giriş */}
+                {/* Apple */}
+                <TouchableOpacity style={styles.socialBtn}>
+                    <FontAwesome name="apple" size={20} color="#000" style={{ marginRight: 10 }} />
+                    <Text style={styles.socialText}>{t('auth.continueWithApple')}</Text>
+                </TouchableOpacity>
 
-            {/* Facebook */}
-            <TouchableOpacity style={styles.socialBtn}>
-                <FontAwesome name="facebook" size={20} color="#1877F2" style={{ marginRight: 10 }} />
-                <Text style={styles.socialText}>{t('auth.continueWithFacebook')}</Text>
-            </TouchableOpacity>
+                {/* Facebook */}
+                <TouchableOpacity style={styles.socialBtn}>
+                    <FontAwesome name="facebook" size={20} color="#1877F2" style={{ marginRight: 10 }} />
+                    <Text style={styles.socialText}>{t('auth.continueWithFacebook')}</Text>
+                </TouchableOpacity>
 
-            {/* Google */}
-            <TouchableOpacity style={styles.socialBtn}>
-                <FontAwesome name="google" size={20} color="#EA4335" style={{ marginRight: 10 }} />
-                <Text style={styles.socialText}>{t('auth.continueWithGoogle')}</Text>
-            </TouchableOpacity>
+                {/* Google */}
+                <TouchableOpacity style={styles.socialBtn}>
+                    <FontAwesome name="google" size={20} color="#EA4335" style={{ marginRight: 10 }} />
+                    <Text style={styles.socialText}>{t('auth.continueWithGoogle')}</Text>
+                </TouchableOpacity>
 
 
-            {/* Dil ve Ülke */}
-            <LanguageSelector />
-        </ScrollView>
+                {/* Dil ve Ülke */}
+                <LanguageSelector />
+            </ScrollView>
         </View>
     );
 }
@@ -149,6 +151,8 @@ const styles = StyleSheet.create({
         padding: 12,
         marginBottom: 12,
         fontSize: 14,
+        textAlign: I18nManager.isRTL ? 'right' : 'left', // buraya ekle
+
     },
     loginBtn: {
         backgroundColor: '#222',

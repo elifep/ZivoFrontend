@@ -6,14 +6,14 @@ import SalonCard from '@/components/SalonCard';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { getAllBusinesses } from '@/services/businessService';
 import { useRouter } from 'expo-router';
-import { API_URL } from '@/config/config';
+import { useTranslation } from 'react-i18next';
 
 export default function IndexScreen() {
-  const [selectedCategory, setSelectedCategory] = useState('Hepsi');
   const [salons, setSalons] = useState<any[]>([]);
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
+  const [selectedCategory, setSelectedCategory] = useState(t('explore.categories.all'));
   const router = useRouter();
-  console.log("IndexScreen yüklendi")
   useEffect(() => {
     getAllBusinesses().then((data) => {
       console.log('Gelen veriler:', data);
@@ -43,11 +43,12 @@ export default function IndexScreen() {
       backgroundColor: '#000',
       paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     }}>
+      <StatusBar backgroundColor={colors.background} translucent={false} />
       <ScrollView style={{ backgroundColor: colors.background }}>
         <ExploreHeader selected={selectedCategory} onSelect={setSelectedCategory} />
         <FilterRow />
 
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Tüm Salonlar</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('explore.title')}</Text>
 
         {salons.length > 0 ? (
           salons.map((item) => (
@@ -67,7 +68,7 @@ export default function IndexScreen() {
             </TouchableOpacity>
           ))
         ) : (
-          <Text style={{ padding: 16, color: colors.text }}>Salon bulunamadı.</Text>
+          <Text style={{ padding: 16, color: colors.text }}>{t('explore.noSalons')}</Text>
         )}
 
       </ScrollView>

@@ -1,24 +1,27 @@
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
     selected: string;
     onSelect: (category: string) => void;
 }
 
-const categories = ['Hepsi', 'Saç Hizmetleri', 'Tırnak Hizmetleri', 'Cilt Bakımı'];
+
 
 export default function ExploreHeader({ selected, onSelect }: Props) {
     const { colors } = useAppTheme();
+    const { t } = useTranslation();
 
+    const categories = [t('explore.categories.all'), t('explore.categories.hair'), t('explore.categories.nail'), t('explore.categories.skin')];
     return (
         <View style={[{ padding: 8, paddingTop: 16 }, { backgroundColor: '#000000' }]}>
             {/* Arama Kutusu */}
             <View style={[styles.searchBox, { backgroundColor: colors.searchBackground }]}>
                 <Feather name="search" size={18} color={colors.icon} style={{ marginRight: 8 }} />
                 <TextInput
-                    placeholder="Hizmet veya işletme adını arayın"
+                    placeholder={t('explore.searchPlaceholder')}
                     placeholderTextColor={colors.icon}
                     style={[styles.input, { color: colors.text }]}
                 />
@@ -28,12 +31,12 @@ export default function ExploreHeader({ selected, onSelect }: Props) {
             <View style={styles.row}>
                 <TouchableOpacity style={[styles.optionBox, { backgroundColor: colors.card }]}>
                     <Feather name="map-pin" size={16} color={colors.icon} />
-                    <Text style={[styles.optionText, { color: colors.text }]}>Nereye?</Text>
+                    <Text style={[styles.optionText, { color: colors.text }]}>{t('explore.location')}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={[styles.optionBox, { backgroundColor: colors.card }]}>
                     <Feather name="calendar" size={16} color={colors.icon} />
-                    <Text style={[styles.optionText, { color: colors.text }]}>Ne Zaman?</Text>
+                    <Text style={[styles.optionText, { color: colors.text }]}>{t('explore.date')}</Text>
                 </TouchableOpacity>
             </View>
 
@@ -75,6 +78,7 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         fontSize: 14,
+        alignItems: 'flex-start'
     },
     row: {
         flexDirection: 'row',

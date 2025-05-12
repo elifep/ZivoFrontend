@@ -72,5 +72,28 @@
         "loginSuccess": "مرحباً بك!",
         "loginErrorTitle": "فشل تسجيل الدخول",
         "loginError": "البريد الإلكتروني أو كلمة المرور غير صحيحة."
+    },
+    "salonDetail": {
+        "tabs": {
+            "services": "الخدمات",
+            "reviews": "المراجعات",
+            "portfolio": "المعرض",
+            "details": "التفاصيل"
+        },
+        "searchPlaceholder": "ابحث عن خدمة...",
+        "bookButton": "احجز الآن"
+    },
+    "explore": {
+        "title": "جميع الصالونات",
+        "noSalons": "لم يتم العثور على صالونات.",
+        "searchPlaceholder": "ابحث عن خدمة أو صالون",
+        "location": "أين؟",
+        "date": "متى؟",
+        "categories": {
+            "all": "الكل",
+            "hair": "خدمات الشعر",
+            "nail": "خدمات الأظافر",
+            "skin": "العناية بالبشرة"
+        }
     }
 }

@@ -72,5 +72,28 @@
         "loginSuccess": "Welcome!",
         "loginErrorTitle": "Login Failed",
         "loginError": "Invalid email or password."
+    },
+    "salonDetail": {
+        "tabs": {
+            "services": "Services",
+            "reviews": "Reviews",
+            "portfolio": "Portfolio",
+            "details": "Details"
+        },
+        "searchPlaceholder": "Search for a service...",
+        "bookButton": "Book Now"
+    },
+    "explore": {
+        "title": "All Salons",
+        "noSalons": "No salons found.",
+        "searchPlaceholder": "Search for a service or business",
+        "location": "Where?",
+        "date": "When?",
+        "categories": {
+            "all": "All",
+            "hair": "Hair Services",
+            "nail": "Nail Services",
+            "skin": "Skin Care"
+        }
     }
 }
