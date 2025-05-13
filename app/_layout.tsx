@@ -10,7 +10,6 @@ function StatusBarWithTheme() {
   const pathname = usePathname();
 
   const isIndex = pathname === '/';
-  // console.log('isIndex', isIndex);
 
   return (
     <StatusBar
