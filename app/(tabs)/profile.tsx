@@ -14,27 +14,29 @@ import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import moment from 'moment';
+import { TouchableWithoutFeedback } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 export default function ProfilimScreen() {
     const { colors } = useAppTheme();
+    const { t } = useTranslation();
     const { profile, fetchProfile, updateProfile } = useProfileStore();
     const logout = useAuthStore((state) => state.logout);
     const router = useRouter();
-
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [previewVisible, setPreviewVisible] = useState(false);
+
     const [form, setForm] = useState({
         full_name: '',
         phone: '',
         birthday: '',
         gender: '',
         address: '',
-        image: undefined as (File & { uri: string }) | undefined,
+        image: undefined as ImagePicker.ImagePickerAsset | undefined, // ✅
     });
 
     useEffect(() => {
-        fetchProfile().then(() => {
-            console.log('Profil çekildi:', useProfileStore.getState().profile);
-        }).catch((err) => {
+        fetchProfile().catch((err) => {
             Toast.show({ type: 'error', text1: 'Profil yüklenemedi', text2: err.message });
         });
     }, []);
@@ -66,17 +68,12 @@ export default function ProfilimScreen() {
         });
 
         if (!result.canceled && result.assets[0]) {
-            const selected = result.assets[0];
-            const file = {
-                uri: selected.uri,
-                name: selected.uri.split('/').pop() || 'image.jpg',
-                type: 'image/jpeg',
-            } as File & { uri: string };
-
-            setForm((prev) => ({ ...prev, image: file }));
+            setForm((prev) => ({
+                ...prev,
+                image: result.assets[0], // 🔥 orijinal asset nesnesi
+            }));
         }
     };
-
     const handleSave = async () => {
         try {
             await updateProfile(form);
@@ -88,20 +85,27 @@ export default function ProfilimScreen() {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-            <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.background }]}>
+            <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
                 <Text style={[styles.title, { color: colors.text }]}>Profilim</Text>
 
                 <View style={styles.imageContainer}>
-                    {form.image ? (
-                        <Image source={{ uri: form.image.uri }} style={styles.image} />
-                    ) : profile?.image_url ? (
-                        <Image source={{ uri: `http://10.0.2.2:5000/${profile.image_url}` }} style={styles.image} />
+                    {form.image || profile?.signed_url ? (
+                        <TouchableOpacity onPress={() => setPreviewVisible(true)}>
+                            <Image source={{ uri: form.image?.uri || profile?.signed_url }} style={styles.image} />
+                            <TouchableOpacity onPress={pickImage} style={styles.imageEditIcon}>
+                                <Ionicons name="camera" size={24} color="#fff" />
+                            </TouchableOpacity>
+                        </TouchableOpacity>
                     ) : (
-                        <Ionicons name="person-circle-outline" size={120} color={colors.icon} />
+                        <TouchableOpacity onPress={() => setPreviewVisible(true)}>
+                            <TouchableOpacity onPress={pickImage} style={styles.imageEditIcon}>
+                                <Ionicons name="camera" size={22} color="#fff" />
+                            </TouchableOpacity>
+                            <Ionicons name="person-circle-outline" size={120} color={colors.icon} />
+                        </TouchableOpacity>
                     )}
-                    <TouchableOpacity onPress={pickImage} style={[styles.pickBtn, { backgroundColor: colors.primary }]}>
-                        <Text style={{ color: colors.buttonText }}>Fotoğrafı Değiştir</Text>
-                    </TouchableOpacity>
+
+
                 </View>
 
                 <TextInput
@@ -165,7 +169,35 @@ export default function ProfilimScreen() {
                 <TouchableOpacity onPress={handleSave} style={[styles.saveBtn, { backgroundColor: colors.primary }]}>
                     <Text style={{ color: colors.buttonText }}>KAYDET</Text>
                 </TouchableOpacity>
+                {previewVisible && (// resim açılınca olan modal
+                    <TouchableWithoutFeedback onPress={() => setPreviewVisible(false)}>
+                        <View style={styles.modalOverlay}>
+                            <View style={styles.modalContent}>
+                                <Image
+                                    source={{ uri: form.image?.uri || profile?.signed_url }}
+                                    style={styles.previewImage}
+                                    resizeMode="contain"
+                                />
 
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        setForm((prev) => ({ ...prev, image: undefined }));
+                                        setPreviewVisible(false);
+                                    }}
+                                    style={styles.deleteIconBtn}
+                                >
+                                    <Ionicons name="trash" size={28} color="#fff" />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={pickImage}
+                                    style={styles.editIconBtn}
+                                >
+                                    <Ionicons name="camera" size={28} color="#fff" />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </TouchableWithoutFeedback>
+                )}
                 <Text style={[styles.sectionTitle, { color: colors.icon }]}>Tema Seçimi</Text>
                 <ThemePicker />
 
@@ -182,22 +214,35 @@ export default function ProfilimScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        padding: 20,
+        flex: 1,
+        padding: 16,
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
+        alignContent: 'center',
     },
     imageContainer: {
         alignItems: 'center',
         marginBottom: 20,
+        position: 'relative', // ⬅ önemli
     },
     image: {
         width: 120,
         height: 120,
         borderRadius: 60,
-        marginBottom: 10,
+        borderColor: '#ccc',
+        borderWidth: 2,
+    },
+    imageEditIcon: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        backgroundColor: '#000',
+        borderRadius: 20,
+        padding: 6,
+        zIndex: 5,
     },
     pickBtn: {
         padding: 10,
@@ -221,5 +266,45 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         marginBottom: 8,
         marginTop: 24,
+    },
+    modalOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 100,
+        elevation: 100,
+    },
+    modalContent: {
+        alignItems: 'center',
+        zIndex: 101,
+    },
+    previewImage: {
+        width: 450,
+        height: 550,
+        borderRadius: 8,
+        marginBottom: 20,
+    },
+    deleteIconBtn: {
+        position: 'absolute',
+        top: 10,
+        right: 40,
+        padding: 10,
+        backgroundColor: '#e53935',
+        borderRadius: 30,
+        zIndex: 110,
+    },
+    editIconBtn: {
+        position: 'absolute',
+        top: 80,
+        right: 40,
+        padding: 10,
+        backgroundColor: '#e53935',
+        borderRadius: 30,
+        zIndex: 110,
     },
 });

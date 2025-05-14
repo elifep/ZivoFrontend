@@ -3,32 +3,33 @@ import { create } from 'zustand';
 import { getMyProfile, updateMyProfile, ProfileFormValues } from '@/services/profileApi';
 
 interface Profile {
-    profileId: string;
-    userId: string;
-    phone: string | null;
-    birthday: string | null;
-    gender: string | null;
-    address: string | null;
-    full_name: string | null;
-    image_url: string | null;
+  profileId: string;
+  userId: string;
+  phone: string | null;
+  birthday: string | null;
+  gender: string | null;
+  address: string | null;
+  full_name: string | null;
+  image_url: string | null;
+  signed_url?: string;
 }
 
 interface ProfileStore {
-    profile: Profile | null;
-    fetchProfile: () => Promise<void>;
-    updateProfile: (data: ProfileFormValues) => Promise<void>;
+  profile: Profile | null;
+  fetchProfile: () => Promise<void>;
+  updateProfile: (data: ProfileFormValues) => Promise<void>;
 }
 
 export const useProfileStore = create<ProfileStore>((set) => ({
-    profile: null,
+  profile: null,
 
-    fetchProfile: async () => {
-        const profile = await getMyProfile();
-        set({ profile });
-    },
+  fetchProfile: async () => {
+    const profile = await getMyProfile();
+    set({ profile });
+  },
 
-    updateProfile: async (data) => {
-        const updated = await updateMyProfile(data);
-        set({ profile: updated });
-    },
+  updateProfile: async (data) => {
+    const updated = await updateMyProfile(data);
+    set({ profile: updated });
+  },
 }));

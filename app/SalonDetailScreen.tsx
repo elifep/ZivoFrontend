@@ -77,7 +77,7 @@ export default function SalonDetailScreen() {
                                 </TouchableOpacity>
                             </View>
                         </View>
-                        <Text style={styles.salonAddress}>{salonData.address}</Text>
+                        <Text style={styles.salonAddress}>{salonData.adressline1}</Text>
                     </View>
                 </View>
 

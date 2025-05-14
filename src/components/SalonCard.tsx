@@ -6,7 +6,7 @@ import { API_URL } from '@/config/config';
 interface Props {
   image_url: string;
   businessName: string;
-  address: string;
+  adressline1: string;
   liked?: boolean;
   fullWidth?: boolean;
   onToggleLike?: () => void;
@@ -15,7 +15,7 @@ interface Props {
 export default function SalonCard({
   image_url,
   businessName,
-  address,
+  adressline1,
   liked,
   fullWidth,
   onToggleLike,
@@ -64,7 +64,7 @@ export default function SalonCard({
       <View style={styles.info}>
         <Text style={[styles.name, { color: colors.text }]}>{businessName}</Text>
         <Text style={[styles.address, { color: colors.icon }]} numberOfLines={1}>
-          {address}
+          {adressline1}
         </Text>
       </View>
     </View>

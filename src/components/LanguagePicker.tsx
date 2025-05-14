@@ -17,7 +17,7 @@ export default function LanguagePicker() {
     ]);
 
     return (
-        <View style={{ zIndex: 2000 }}>
+        <View style={{ zIndex: open ? 10 : 1, position: 'relative' }}>
             <DropDownPicker
                 open={open}
                 value={value}

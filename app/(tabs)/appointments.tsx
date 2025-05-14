@@ -1,6 +1,5 @@
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Modal, ActivityIndicator } from 'react-native';
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { mockAppointments } from '@/data/appointments';
 import { Calendar } from 'react-native-calendars';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,33 +8,61 @@ import { LocaleConfig } from 'react-native-calendars';
 import { useTranslation } from 'react-i18next';
 import { setupCalendarLocales } from '@/config/calendarLocales';
 import { formatDate } from '@/config/date';
-import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { format } from 'date-fns'; // en üstte
-type Appointment = {
-    id: string;
-    date: string;
-    salon: string;
-    service: string;
-    employee: string;
-    price: number;
-    start: string;
-    end: string;
-    status: 'active' | 'cancelled';
-};
+import { useRouter } from 'expo-router';
+import { useAppointmentStore } from '@/stores/appointmentStore'; // ✅ store'u çağır
+import { useServiceStore } from '@/stores/serviceStore';
+import { useBusinessStore } from '@/stores/businessStore';
+
 
 export default function AppointmentsScreen() {
     const { colors, isDark } = useAppTheme();
+    const router = useRouter();
     const { t, i18n } = useTranslation();
     const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
-    const router = useRouter();
-
-    const appointments = mockAppointments.filter(a => a.date === selectedDate);
 
     const [calendarReady, setCalendarReady] = useState(false);
-    const [selectedToCancel, setSelectedToCancel] = useState<Appointment | null>(null);
+    // const [selectedToCancel, setSelectedToCancel] = useState<Appointment | null>(null);
     const [cancelStep, setCancelStep] = useState<'confirm' | 'loading' | 'success' | null>(null);
 
+    const { appointments, fetchAppointments, cancel } = useAppointmentStore();
+
+    const { services, fetchAllServices } = useServiceStore();
+    const getServiceById = (id: string | null) =>
+        services.find(s => s.servicesid === id);
+
+    const { businesses, fetchBusinesses } = useBusinessStore();
+    const getBusinessById = (id: string) => businesses.find(b => b.businessId === id);
+
+    const sortedAppointments = [...appointments].sort((a, b) =>
+        new Date(a.appointment_time).getTime() - new Date(b.appointment_time).getTime()
+    );
+
+    const filteredAppointments = sortedAppointments.filter(a =>
+        // a.status === 'active' &&
+        format(new Date(a.appointment_time), 'yyyy-MM-dd') === selectedDate
+    );
+    const [selectedToCancel, setSelectedToCancel] = useState<any>(null);
+
+
+    useEffect(() => {
+        const loadAllData = async () => {
+            try {
+                await fetchAppointments();
+                const businessesData = await fetchBusinesses();
+
+                const firstBusinessId = businessesData?.[0]?.businessId;
+                if (firstBusinessId) {
+                    await fetchAllServices();
+                }
+            } catch (err) {
+                console.error('Veriler yüklenirken hata oluştu:', err);
+            }
+        };
+
+        loadAllData();
+    }, []);
 
     useEffect(() => {
         if (cancelStep === 'success') {
@@ -54,177 +81,263 @@ export default function AppointmentsScreen() {
         setTimeout(() => setCalendarReady(true), 50); // kısa bir bekleme ile yeniden render
     }, [i18n.language]);
 
+    console.log('Tüm randevular:', appointments);
+    console.log('Seçili gün:', selectedDate);
+    console.log('Filtrelenmiş randevular:', filteredAppointments);
+
     return (
-        <View style={{ flex: 1, backgroundColor: colors.background }}>
+        // <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <SafeAreaView style={{ backgroundColor: colors.background }}>
             <StatusBar style={isDark ? 'light' : 'dark'} backgroundColor={colors.background} translucent={false} />
-            <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+
+            <Text
+                style={{
+                    fontSize: 22,
+                    fontWeight: 'bold',
+                    color: colors.text,
+                    textAlign: 'center',
+                    marginTop: 16,
+                    marginHorizontal: 16,
+                    marginBottom: 8,
+                }}
+            >
+                {t('appointments.title')}
+            </Text>
+
+            <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
+
+                {calendarReady && (
+                    <Calendar
+                        current={selectedDate} // bugünün tarihi burada
+                        key={i18n.language}
+                        onDayPress={(day) => setSelectedDate(day.dateString)}
+                        markedDates={{
+                            [selectedDate]: { selected: true, selectedColor: colors.primary },
+                        }}
+                        theme={{
+                            calendarBackground: colors.background,
+                            dayTextColor: colors.text,
+                            monthTextColor: colors.text,
+                            todayTextColor: colors.primary,
+                            selectedDayBackgroundColor: colors.primary,
+                            selectedDayTextColor: colors.background,
+                            arrowColor: colors.text,
+                        }}
+                    />
+                )}
+
                 <Text
-                    style={{
-                        fontSize: 22,
-                        fontWeight: 'bold',
-                        color: colors.text,
-                        textAlign: 'center',
-                        marginTop: 16,
-                        marginHorizontal: 16,
-                        marginBottom: 8,
-                    }}
+                    style={[
+                        styles.dateText,
+                        { color: colors.text }
+                    ]}
                 >
-                    {t('appointments.title')}
+                    {formatDate(selectedDate, i18n.language)}
                 </Text>
 
-                <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
+                {filteredAppointments.length === 0 && (
+                    <View style={[styles.noAppointmentBox, { backgroundColor: colors.card, borderColor: colors.softBorder }]}>
+                        <Feather name="calendar" size={20} color={colors.icon} style={{ marginBottom: 6 }} />
+                        <Text style={{ color: colors.text, fontSize: 14, textAlign: 'center' }}>
+                            {t('appointments.noAppointments')}
+                        </Text>
+                    </View>
+                )}
+                {filteredAppointments.map((a) => {
+                    const service = getServiceById(a.servicesid || '');
+                    const business = getBusinessById(a.businessid);
+                    const now = new Date();
+                    const start = new Date(a.appointment_time);
+                    const end = service?.duration_min
+                        ? new Date(start.getTime() + service.duration_min * 60000)
+                        : null;
+                    const isPast = start < now;
 
-                    {calendarReady && (
-                        <Calendar
-                            current={selectedDate} // bugünün tarihi burada
-                            key={i18n.language}
-                            onDayPress={(day) => setSelectedDate(day.dateString)}
-                            markedDates={{
-                                [selectedDate]: { selected: true, selectedColor: colors.primary },
-                            }}
-                            theme={{
-                                calendarBackground: colors.background,
-                                dayTextColor: colors.text,
-                                monthTextColor: colors.text,
-                                todayTextColor: colors.primary,
-                                selectedDayBackgroundColor: colors.primary,
-                                selectedDayTextColor: colors.background,
-                                arrowColor: colors.text,
-                            }}
-                        />
-                    )}
-
-                    <Text
-                        style={[
-                            styles.dateText,
-                            { color: colors.text }
-                        ]}
-                    >
-                        {formatDate(selectedDate, i18n.language)}
-                    </Text>
-
-                    {appointments.length === 0 && (
-                        <View style={[styles.noAppointmentBox, { backgroundColor: colors.card, borderColor: colors.softBorder }]}>
-                            <Feather name="calendar" size={20} color={colors.icon} style={{ marginBottom: 6 }} />
-                            <Text style={{ color: colors.text, fontSize: 14, textAlign: 'center' }}>
-                                {t('appointments.noAppointments')}
-                            </Text>
-                        </View>
-                    )}
-
-                    {appointments.map((a) => (
-                        <View key={a.id} style={[styles.card, { backgroundColor: colors.card }]}>
-                            <View style={styles.cardTopRow}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                                    <Feather name="map-pin" size={16} color={colors.text} />
-                                    <Text style={[styles.salonText, { color: colors.text }]}>{a.salon}</Text>
-                                </View>
-                            </View>
-                            <View style={[styles.serviceLine, { backgroundColor: colors.softBorder }]} />
-                            <View style={styles.rowBetween}>
-                                <View >
-                                    <View style={styles.infoRow}>
-                                        <Feather name="scissors" size={14} color={colors.icon} />
-                                        <Text style={[styles.infoText, { color: colors.icon }]}>{a.service}</Text>
-                                    </View>
-                                    <View style={styles.infoRow}>
-                                        <Feather name="user" size={14} color={colors.icon} />
-                                        <Text style={[styles.infoText, { color: colors.icon }]}>{t('appointments.employee')}: {a.employee}</Text>
-                                    </View>
-                                </View>
-                                <View style={{ alignItems: 'flex-end' }}>
-                                    <Text style={[styles.priceText, { color: colors.text }]}>{a.price} ₺</Text>
-                                    <Text style={[styles.timeText, { color: colors.icon }]}>{a.start} - {a.end}</Text>
-                                </View>
-                            </View>
-                            <View style={styles.buttonRow}>
-                                <TouchableOpacity style={[styles.actionButton, styles.editButton]} onPress={() => router.push({ pathname: '/EditAppointmentScreen', params: { appointment: JSON.stringify(a) } })}>
-                                    <Text style={styles.editButtonText}>
-                                        <Feather name="edit" size={14} color="#1585A6" /> {t('appointments.edit')}
-                                    </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={[styles.actionButton, styles.cancelButton]} onPress={() => {
-                                    setSelectedToCancel(a);       // hangi randevuyu iptal edeceğini ayarla
-                                    setCancelStep('confirm');     // 1. modalı aç
-                                }}
-                                >
-                                    <Text style={styles.cancelButtonText}>
-                                        <Feather name="x-circle" size={14} color="#d9534f" /> {t('appointments.cancel')}
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    ))}
-
-                    <Modal transparent visible={cancelStep !== null} animationType="fade">
-                        <View style={styles.modalOverlay}>
-                            <View style={[
-                                styles.modalBox,
-                                cancelStep === 'success' ? styles.successBox :
-                                    cancelStep === 'loading' ? styles.loadingBox :
-                                        styles.confirmBox
-                            ]}>
-                                {/* Başlık */}
-                                <View style={styles.modalHeader}>
-                                    <Text style={styles.modalTitle}>
-                                        {cancelStep === 'success' && 'Onay ✅'}
-                                        {cancelStep === 'loading' && 'İptal 🔄'}
-                                        {cancelStep === 'confirm' && 'İptal ❌'}
-                                    </Text>
-                                </View>
-
-                                {/* İçerik */}
-                                {cancelStep === 'confirm' && (
-                                    <>
-                                        <Text style={styles.modalText}>İptal etmek istediğinize emin misiniz?</Text>
-                                        <View style={styles.modalButtonRow}>
-                                            <TouchableOpacity
-                                                style={styles.modalButton}
-                                                onPress={() => {
-                                                    setCancelStep('loading');
-                                                    setTimeout(() => {
-                                                        // iptal işlemi
-                                                        // burada selectedToCancel.status = 'cancelled' gibi güncelleme yapabilirsin
-                                                        // örnek için basit bir state update yazılabilir
-                                                        setCancelStep('success');
-                                                    }, 1500);
-                                                }}
-                                            >
-                                                <Text style={styles.modalButtonText}>Evet</Text>
-                                            </TouchableOpacity>
-                                            <TouchableOpacity
-                                                style={[styles.modalButton, { backgroundColor: '#ccc' }]}
-                                                onPress={() => setCancelStep(null)}
-                                            >
-                                                <Text style={styles.modalButtonText}>Hayır</Text>
-                                            </TouchableOpacity>
-                                        </View>
-                                    </>
-                                )}
-
-                                {cancelStep === 'loading' && (
-                                    <>
-                                        <Text style={styles.modalText}>Randevu iptal ediliyor..</Text>
-                                        <ActivityIndicator size="large" color="#e11d48" style={{ marginTop: 16 }} />
-                                    </>
-                                )}
-                                {cancelStep === 'success' && (
-                                    <>
-                                        <Text style={styles.modalText}>
-                                            Randevu başarılı bir şekilde iptal edilmiştir.
+                    const statusLabel = a.status === 'cancelled'
+                        ? { text: t('appointments.status_cancelled'), color: '#fca5a5', textColor: '#b91c1c', cardleftColor: '#DC2424' }
+                        : isPast
+                            ? { text: t('appointments.status_past'), color: '#e5e7eb', textColor: '#374151', cardleftColor: '#374151' }
+                            : { text: t('appointments.status_active'), color: '#bbf7d0', textColor: '#15803d', cardleftColor: '#5DBF80' };
+                    console.log(t('appointments.status_cancelled'))
+                    return (
+                        <View key={a.appointmentid} style={[styles.card, { backgroundColor: colors.card }, { borderLeftColor: statusLabel.cardleftColor }]}>
+                            <View style={{ flex: 1, padding: 14 }}>
+                                <View style={styles.cardTopRow}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                                        <Feather name="map-pin" size={16} color={colors.text} />
+                                        <Text style={[styles.salonText, { color: colors.text }]}>
+                                            {business?.businessName || a.businessid}
                                         </Text>
-                                    </>
-                                )}
+                                    </View>
+
+                                    <View style={{
+                                        backgroundColor: statusLabel.color,
+                                        paddingHorizontal: 8,
+                                        paddingVertical: 4,
+                                        borderRadius: 8
+                                    }}>
+                                        <Text style={{ fontSize: 12, fontWeight: 'bold', color: statusLabel.textColor }}>
+                                            {statusLabel.text}
+                                        </Text>
+                                    </View>
+                                </View>
+
+                                <View style={[styles.serviceLine, { backgroundColor: colors.softBorder }]} />
+
+                                <View style={styles.rowBetween}>
+                                    <View>
+                                        <View style={styles.infoRow}>
+                                            <Feather name="scissors" size={14} color={colors.icon} />
+                                            <Text style={[styles.infoText, { color: colors.icon }]}>
+                                                {service?.name || a.servicesid}
+                                            </Text>
+                                        </View>
+                                        <View style={styles.infoRow}>
+                                            <Feather name="user" size={14} color={colors.icon} />
+                                            <Text style={[styles.infoText, { color: colors.icon }]}>
+                                                {t('appointments.employee')}: -
+                                            </Text>
+                                        </View>
+                                    </View>
+
+                                    <View style={{ alignItems: 'flex-end' }}>
+                                        <Text style={[styles.priceText, { color: colors.text }]}>
+                                            {service?.price ? `${service.price} ₺` : '₺'}
+                                        </Text>
+                                        <View style={styles.infoRow}>
+                                            <Feather name="clock" size={16} color={colors.text} />
+                                            <Text style={[styles.timeText, { color: colors.icon }]}>
+                                                {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -{' '}
+                                                {end
+                                                    ? end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                                    : '?'}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                </View>
+
+                                <View style={styles.buttonRow}>
+                                    <TouchableOpacity
+                                        style={[styles.actionButton, styles.editButton,
+                                        a.status === 'cancelled' && styles.disabledButton]}
+                                        onPress={() => {
+                                            if (a.status !== 'cancelled') {
+                                                router.push({ pathname: '/EditAppointmentScreen', params: { appointment: JSON.stringify(a) } });
+                                            }
+                                        }}
+                                        disabled={a.status === 'cancelled'}
+                                    >
+                                        <Text style={[
+                                            styles.editButtonText,
+                                            a.status === 'cancelled' && styles.disabledButtonText
+                                        ]}>
+                                            <Feather name="edit" size={14} color={a.status === 'cancelled' ? '#aaa' : '#1585A6'} /> {t('appointments.edit')}
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[
+                                            styles.actionButton,
+                                            styles.cancelButton,
+                                            a.status === 'cancelled' && styles.disabledButton,
+                                        ]}
+                                        onPress={() => {
+                                            if (a.status !== 'cancelled') {
+                                                setSelectedToCancel(a);
+                                                setCancelStep('confirm');
+                                            }
+                                        }}
+                                        disabled={a.status === 'cancelled'}
+                                    >
+                                        <Text style={[
+                                            styles.cancelButtonText,
+                                            a.status === 'cancelled' && styles.disabledButtonText
+                                        ]}>
+                                            <Feather name="x-circle" size={14} color={a.status === 'cancelled' ? '#aaa' : '#d9534f'} /> {t('appointments.cancel')}
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         </View>
-                    </Modal>
-                </ScrollView>
-            </SafeAreaView>
-        </View>
+                    );
+                })}
+
+                <Modal transparent visible={cancelStep !== null} animationType="fade">
+                    <View style={styles.modalOverlay}>
+                        <View style={[
+                            styles.modalBox,
+                            cancelStep === 'success' ? styles.successBox :
+                                cancelStep === 'loading' ? styles.loadingBox :
+                                    styles.confirmBox
+                        ]}>
+                            {/* Başlık */}
+                            <View style={styles.modalHeader}>
+                                <Text style={styles.modalTitle}>
+                                    {cancelStep === 'success' && 'Onay ✅'}
+                                    {cancelStep === 'loading' && 'İptal 🔄'}
+                                    {cancelStep === 'confirm' && 'İptal ❌'}
+                                </Text>
+                            </View>
+
+                            {/* İçerik */}
+                            {cancelStep === 'confirm' && (
+                                <>
+                                    <Text style={styles.modalText}>İptal etmek istediğinize emin misiniz?</Text>
+                                    <View style={styles.modalButtonRow}>
+                                        <TouchableOpacity
+                                            style={styles.modalButton}
+                                            onPress={() => {
+                                                setCancelStep('loading');
+                                                setTimeout(() => {
+                                                    // iptal işlemi
+                                                    // burada selectedToCancel.status = 'cancelled' gibi güncelleme yapabilirsin
+                                                    // örnek için basit bir state update yazılabilir
+                                                    setCancelStep('success');
+                                                }, 1500);
+                                            }}
+                                        >
+                                            <Text style={styles.modalButtonText}>Evet</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={[styles.modalButton, { backgroundColor: '#ccc' }]}
+                                            onPress={() => setCancelStep(null)}
+                                        >
+                                            <Text style={styles.modalButtonText}>Hayır</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </>
+                            )}
+
+                            {cancelStep === 'loading' && (
+                                <>
+                                    <Text style={styles.modalText}>Randevu iptal ediliyor..</Text>
+                                    <ActivityIndicator size="large" color="#e11d48" style={{ marginTop: 16 }} />
+                                </>
+                            )}
+                            {cancelStep === 'success' && (
+                                <>
+                                    <Text style={styles.modalText}>
+                                        Randevu başarılı bir şekilde iptal edilmiştir.
+                                    </Text>
+                                </>
+                            )}
+                        </View>
+                    </View>
+                </Modal>
+            </ScrollView>
+        </SafeAreaView>
+        // </View>
     );
 }
 
 const styles = StyleSheet.create({
+    disabledButton: {
+        opacity: 0.6,
+        borderColor: '#ccc',
+    },
+
+    disabledButtonText: {
+        color: '#aaa',
+    },
     dateText: {
         fontSize: 18,
         fontWeight: '600',
@@ -236,7 +349,11 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         padding: 14,
         borderRadius: 12,
-        elevation: 2,
+        elevation: 4,
+        borderLeftWidth: 4,
+        paddingLeft: 10, // içerik içeri biraz girsin
+        flexDirection: 'row',
+        overflow: 'hidden', // köşeleri düzgün kesmek için
     },
     cardTopRow: {
         flexDirection: 'row',

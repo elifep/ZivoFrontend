@@ -19,7 +19,10 @@
     "cancel": "İptal Et",
     "noAppointments": "Seçili tarihte bir randevunuz bulunmamaktadır.",
     "noAppointmentsShort": "Randevu bulunamadı",
-    "today": "Bugün"
+    "today": "Bugün",
+    "status_active": "Aktif",
+    "status_cancelled": "İptal Edildi",
+    "status_past": "Geçmiş"
   },
   "buttons": {
     "edit": "Düzenle",

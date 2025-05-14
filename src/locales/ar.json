@@ -19,7 +19,10 @@
         "cancel": "إلغاء",
         "noAppointments": "لا توجد مواعيد في التاريخ المحدد.",
         "noAppointmentsShort": "لا توجد مواعيد",
-        "today": "اليوم"
+        "today": "اليوم",
+        "status_active": "نشط",
+        "status_cancelled": "ملغى",
+        "status_past": "منتهي"
     },
     "buttons": {
         "edit": "تعديل",

@@ -19,7 +19,10 @@
         "cancel": "Cancel",
         "noAppointments": "You have no appointments on the selected date.",
         "noAppointmentsShort": "No appointments found",
-        "today": "Today"
+        "today": "Today",
+        "status_active": "Active",
+        "status_cancelled": "Cancelled",
+        "status_past": "Past"
     },
     "buttons": {
         "edit": "Edit",

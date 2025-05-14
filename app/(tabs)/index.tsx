@@ -20,7 +20,7 @@ export default function IndexScreen() {
       const formatted = data.map((item: any) => ({
         businessId: item.businessid,
         businessName: item.businessname,
-        address: item.address,
+        adressline1: item.adressline1,
         image_url: item.image_url,
         liked: false,
       }));
@@ -59,7 +59,7 @@ export default function IndexScreen() {
             >
               <SalonCard
                 businessName={item.businessName}
-                address={item.address}
+                adressline1={item.adressline1}
                 image_url={item.image_url}
                 fullWidth
                 liked={item.liked}

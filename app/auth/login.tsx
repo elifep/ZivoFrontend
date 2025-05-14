@@ -37,33 +37,6 @@ export default function LoginScreen() {
                 text2: t('toast.loginError'),
             });
         }
-
-        // // Örnek sabit giriş kontrolü
-        // if (email === 'eee' && password === '12345') {
-        //     console.log("Giriş başarılı");
-        //     Toast.show({
-        //         type: 'success',
-        //         text1: t('toast.loginSuccessTitle'),
-        //         text2: t('toast.loginSuccess'),
-        //     });
-        //     // ✅ yönlendirme: (tabs)/index.tsx => Keşfet sayfası
-        //     setTimeout(() => {
-        //         router.replace('/(tabs)');
-        //     }, 800); // Toast görünsün diye küçük bir gecikme
-
-        //     return;
-        // }
-
-        // Devamında yönlendirme yapılabilir
-        // router.push('/(tabs)');
-
-        // if (email !== 'eee' || password !== '123456') {
-        //     Toast.show({
-        //         type: 'error',
-        //         text1: t('toast.loginErrorTitle'),
-        //         text2: t('toast.loginError'),
-        //     });
-        // }
     };
     return (
         <View style={{ flex: 1, backgroundColor: '#fff', paddingTop: 70, alignContent: 'center' }}>
