@@ -3,37 +3,84 @@ import { Ionicons } from '@expo/vector-icons';
 import { Calendar } from 'react-native-calendars';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-
-export const LocaleConfig = {
-    dayNames: ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'],
-    dayNamesShort: ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'],
-    monthNames: ['Ocak', 'Sıral', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
-    monthNamesShort: ['Oca', 'Sır', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'],
-}
-const timeSlots = [
-    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00',
-    '12:30', '13:00', '13:30', '14:00', '14:30', '15:00',
-];
+import { useAppointmentStore } from '@/stores/appointmentStore';
+import { useServiceStore } from '@/stores/serviceStore';
+import { useLocalSearchParams } from 'expo-router'; // serviceId ve businessId parametreleri burada
+import { generateTimeSlots } from '@/utils/time';
+import Toast from 'react-native-toast-message';
 
 export default function RandevuScreen() {
+    const { create } = useAppointmentStore();
     const router = useRouter();
+    const params = useLocalSearchParams();
+    const serviceId = params.servicesId as string;
+    const businessId = params.businessId as string;
     const { colors, isDark } = useAppTheme();
     const [showNoteModal, setShowNoteModal] = useState(false);
-
+    const [availableTimes, setAvailableTimes] = useState<string[]>([]);
     const [selectedEmployee, setSelectedEmployee] = useState<string | null>('irem');
+    const [showStaffModal, setShowStaffModal] = useState(false);
     const [selectedDate, setSelectedDate] = useState<string>('2025-06-10');
     const [selectedTime, setSelectedTime] = useState<string>('11:30');
     const [note, setNote] = useState('');
+    const { services } = useServiceStore();
+    const service = services.find(s => s.servicesid === serviceId);
+    // Örnek: servis süresi props ya da parametre ile geliyor olsun (örnek 30dk)
+    useEffect(() => {
+        const durationMin = 30;
+        const times = generateTimeSlots("09:00", "18:00", durationMin);
+        setAvailableTimes(times);
+    }, []);
+    const getEndTime = (startTime: string, durationMin: number): string => {
+        const [hour, minute] = startTime.split(':').map(Number);
+        const totalMinutes = hour * 60 + minute + durationMin;
 
-    const times = [
-        '10:00', '10:30', '11:00', '11:30',
-        '12:00', '12:30', '13:00', '13:30',
-        '14:00', '14:30', '15:00', '15:30',
-        '16:00', '16:30', '17:00', '17:30',
-    ];
+        const endHour = Math.floor(totalMinutes / 60).toString().padStart(2, '0');
+        const endMin = (totalMinutes % 60).toString().padStart(2, '0');
+
+        return `${endHour}:${endMin}`;
+    };
+
+
+    const handleConfirm = async () => {
+        try {
+            if (!serviceId || !businessId) {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Eksik Bilgi',
+                    text2: 'Hizmet veya işletme bilgisi eksik.',
+                });
+                return;
+            }
+
+            const appointment_time = `${selectedDate}T${selectedTime}:00`;
+
+            const staffIdToSend = selectedEmployee === null || selectedEmployee === 'farketmez' ? null : selectedEmployee;
+
+            await create({
+                businessId,
+                servicesId: serviceId,
+                staffId: staffIdToSend,
+                appointment_time,
+            });
+
+            Toast.show({
+                type: 'success',
+                text1: 'Randevu Oluşturuldu',
+                text2: 'Randevunuz başarıyla oluşturuldu.',
+            });
+            router.replace('/appointments');
+        } catch (err: any) {
+            Toast.show({
+                type: 'error',
+                text1: 'Hata',
+                text2: err.message || 'Randevu oluşturulamadı.',
+            });
+        }
+    };
 
     return (
         <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -50,7 +97,23 @@ export default function RandevuScreen() {
 
                     {/* Çalışan Seçimi */}
                     <View style={styles.employeeRow}>
-                        <TouchableOpacity style={[styles.farkEtmezButton, { borderColor: colors.softBorder }]}><Text style={{ color: colors.text }}>Fark Etmez</Text></TouchableOpacity>
+                        <TouchableOpacity
+                            style={[
+                                styles.farkEtmezButton,
+                                {
+                                    borderColor: selectedEmployee === null ? colors.primary : colors.softBorder,
+                                    backgroundColor: selectedEmployee === null ? colors.primary : 'transparent',
+                                },
+                            ]}
+                            onPress={() => setSelectedEmployee(null)}
+                        >
+                            <Text style={{
+                                color: selectedEmployee === null ? colors.buttonText : colors.text, // ✅ seçildiyse açık tema yazı rengi
+                                fontWeight: '500'
+                            }}>
+                                Fark Etmez
+                            </Text>
+                        </TouchableOpacity>
                         <TouchableOpacity onPress={() => setSelectedEmployee('irem')}>
                             <Ionicons name="person-circle" size={50} color={selectedEmployee === 'irem' ? 'blue' : colors.icon} />
                             <Text style={[styles.employeeLabel, { color: colors.text }]}>İrem Taş</Text>
@@ -84,7 +147,7 @@ export default function RandevuScreen() {
                     {/* Saat Seçimi */}
                     {/* Saatler - Scrollable */}
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingVertical: 12, paddingLeft: 16 }}>
-                        {times.map((time) => (
+                        {availableTimes.map((time) => (
                             <TouchableOpacity
                                 key={time}
                                 style={[
@@ -103,16 +166,20 @@ export default function RandevuScreen() {
                     {/* Seçilen Hizmet */}
                     <View style={[styles.serviceCard, { backgroundColor: colors.card }]}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text style={[styles.serviceTitle, { color: colors.text }]}>Manikür</Text>
+                            <Text style={[styles.serviceTitle, { color: colors.text }]}>{service?.name || 'Hizmet'}</Text>
                             <View style={[{ flexDirection: 'column' }, { alignItems: 'flex-end' }]}>
-                                <Text style={[styles.servicePrice, { color: colors.text }]}>350 ₺</Text>
-                                <Text style={{ color: colors.text, marginBottom: 4 }}>{selectedTime} - {times[times.indexOf(selectedTime) + 1]}</Text>
+                                <Text style={[styles.servicePrice, { color: colors.text }]}>{service?.price || '350'}₺</Text>
+                                <Text style={{ color: colors.text, marginBottom: 4 }}>{selectedTime} - {getEndTime(selectedTime, service?.duration_min || 30)}</Text>
                             </View>
                         </View>
+
                         <View style={[styles.serviceLine, { backgroundColor: colors.softBorder }]} />
+
                         <View style={styles.employeeLine}>
-                            <Text style={{ color: colors.text }}>Çalışan: {selectedEmployee === 'julide' ? 'Jülide Aslan' : 'İrem Taş'}</Text>
-                            <TouchableOpacity style={styles.editButton}>
+                            <Text style={{ color: colors.text }}>
+                                Çalışan: {selectedEmployee === null ? 'Fark Etmez' : selectedEmployee === 'julide' ? 'Jülide Aslan' : 'İrem Taş'}
+                            </Text>
+                            <TouchableOpacity style={styles.editButton} onPress={() => setShowStaffModal(true)}>
                                 <Text style={{ fontSize: 12 }}>Değiştir</Text>
                             </TouchableOpacity>
                         </View>
@@ -197,15 +264,82 @@ export default function RandevuScreen() {
                                 </TouchableOpacity>
                             </View>
                         </TouchableOpacity>
-                    </Modal>
 
+                    </Modal>
+                    {/* Çalışan Seçimi Modalı */}
+                    <Modal
+                        visible={showStaffModal}
+                        transparent
+                        animationType="fade"
+                        onRequestClose={() => setShowStaffModal(false)}
+                    >
+                        <TouchableOpacity
+                            activeOpacity={1}
+                            onPressOut={() => setShowStaffModal(false)}
+                            style={{
+                                flex: 1,
+                                backgroundColor: 'rgba(0,0,0,0.6)',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                padding: 24,
+                            }}
+                        >
+                            <View style={{
+                                backgroundColor: colors.card,
+                                padding: 20,
+                                borderRadius: 12,
+                                width: '100%',
+                                maxWidth: 300,
+                            }}>
+                                <Text style={{ color: colors.text, fontSize: 16, fontWeight: 'bold', marginBottom: 12 }}>
+                                    Çalışan Seçin
+                                </Text>
+
+                                {[
+                                    { id: null, name: 'Fark Etmez' },
+                                    { id: 'irem', name: 'İrem Taş' },
+                                    { id: 'julide', name: 'Jülide Aslan' }
+                                ].map((staff) => (
+                                    <TouchableOpacity
+                                        key={staff.id ?? 'farketmez'}
+                                        style={{
+                                            paddingVertical: 10,
+                                            paddingHorizontal: 12,
+                                            backgroundColor: selectedEmployee === staff.id ? colors.primary : colors.searchBackground,
+                                            borderRadius: 6,
+                                            marginBottom: 8,
+                                        }}
+                                        onPress={() => {
+                                            setSelectedEmployee(staff.id);
+                                            setShowStaffModal(false);
+                                        }}
+                                    >
+                                        <Text style={{ color: selectedEmployee === staff.id ? colors.buttonText : colors.text }}>
+                                            {staff.name}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
+
+                                <TouchableOpacity
+                                    onPress={() => setShowStaffModal(false)}
+                                    style={{
+                                        marginTop: 10,
+                                        alignSelf: 'flex-end',
+                                    }}
+                                >
+                                    <Text style={{ color: colors.primary }}>Kapat</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </TouchableOpacity>
+                    </Modal>
                     {/* Alt Toplam ve Buton */}
                     <View style={styles.footer}>
                         <View>
-                            <Text style={{ color: colors.text, fontSize: 20, fontWeight: 'bold' }}>350 ₺</Text>
-                            <Text style={{ color: colors.mutedText }}>30 dk</Text>
+                            <Text style={{ color: colors.text, fontSize: 20, fontWeight: 'bold' }}>{service?.price || '350'}₺</Text>
+                            <Text style={{ color: colors.mutedText }}>{service?.duration_min || '30'}dk</Text>
                         </View>
-                        <TouchableOpacity style={[styles.confirmButton, { backgroundColor: colors.primary }]}>
+                        <TouchableOpacity style={[styles.confirmButton, { backgroundColor: colors.primary }]}
+                            onPress={handleConfirm}>
                             <Text style={{ color: colors.buttonText, fontWeight: 'bold' }}>Randevuyu Onayla</Text>
                         </TouchableOpacity>
                     </View>

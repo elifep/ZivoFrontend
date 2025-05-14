@@ -87,7 +87,7 @@ export default function AppointmentsScreen() {
 
     return (
         // <View style={{ flex: 1, backgroundColor: colors.background }}>
-        <SafeAreaView style={{ backgroundColor: colors.background }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
             <StatusBar style={isDark ? 'light' : 'dark'} backgroundColor={colors.background} translucent={false} />
 
             <Text
@@ -158,7 +158,6 @@ export default function AppointmentsScreen() {
                         : isPast
                             ? { text: t('appointments.status_past'), color: '#e5e7eb', textColor: '#374151', cardleftColor: '#374151' }
                             : { text: t('appointments.status_active'), color: '#bbf7d0', textColor: '#15803d', cardleftColor: '#5DBF80' };
-                    console.log(t('appointments.status_cancelled'))
                     return (
                         <View key={a.appointmentid} style={[styles.card, { backgroundColor: colors.card }, { borderLeftColor: statusLabel.cardleftColor }]}>
                             <View style={{ flex: 1, padding: 14 }}>
@@ -207,9 +206,9 @@ export default function AppointmentsScreen() {
                                         <View style={styles.infoRow}>
                                             <Feather name="clock" size={16} color={colors.text} />
                                             <Text style={[styles.timeText, { color: colors.icon }]}>
-                                                {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -{' '}
+                                                {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })} -{' '}
                                                 {end
-                                                    ? end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                                    ? end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
                                                     : '?'}
                                             </Text>
                                         </View>
@@ -285,18 +284,25 @@ export default function AppointmentsScreen() {
                                     <View style={styles.modalButtonRow}>
                                         <TouchableOpacity
                                             style={styles.modalButton}
-                                            onPress={() => {
+                                            onPress={async () => {
+                                                if (!selectedToCancel) return;
+
                                                 setCancelStep('loading');
-                                                setTimeout(() => {
-                                                    // iptal işlemi
-                                                    // burada selectedToCancel.status = 'cancelled' gibi güncelleme yapabilirsin
-                                                    // örnek için basit bir state update yazılabilir
+
+                                                try {
+                                                    await cancel(selectedToCancel.appointmentid); // ✅ randevuyu iptal et
                                                     setCancelStep('success');
-                                                }, 1500);
-                                            }}
+                                                } catch (error) {
+                                                    setCancelStep(null);
+                                                    alert('Randevu iptal edilemedi.');
+                                                    console.error(error);
+                                                }
+                                            }
+                                            }
                                         >
                                             <Text style={styles.modalButtonText}>Evet</Text>
                                         </TouchableOpacity>
+
                                         <TouchableOpacity
                                             style={[styles.modalButton, { backgroundColor: '#ccc' }]}
                                             onPress={() => setCancelStep(null)}

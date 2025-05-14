@@ -116,7 +116,13 @@ export default function SalonDetailScreen() {
                                     </View>
                                     <TouchableOpacity
                                         style={[styles.bookButton, { backgroundColor: colors.primary }]}
-                                        onPress={() => router.push('/RandevuScreen')}>
+                                        onPress={() => router.push({
+                                            pathname: '/RandevuScreen',
+                                            params: {
+                                                servicesId: service.servicesid,
+                                                businessId: salonData.businessId
+                                            }
+                                        })}>
                                         <Text style={[styles.bookButtonText, { color: colors.background }]}>{t('salonDetail.bookButton')}</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -162,7 +168,7 @@ const styles = StyleSheet.create({
     discountBadge: { backgroundColor: '#fff', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
     discountText: { fontSize: 12, fontWeight: 'bold', color: '#000' },
     salonAddress: { color: '#ccc', fontSize: 13, marginTop: 2 },
-    tabContainer: { flexDirection: 'row', paddingVertical: 8},
+    tabContainer: { flexDirection: 'row', paddingVertical: 8 },
     tabButton: { flex: 1, alignItems: 'center' },
     tabText: { fontSize: 14 },
     activeTabText: { fontWeight: 'bold' },

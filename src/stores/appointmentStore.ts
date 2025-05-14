@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { getUserAppointments, cancelAppointment } from '@/services/appointmentApi';
+import { getUserAppointments, cancelAppointment, createAppointment } from '@/services/appointmentApi';
 
 interface Appointment {
     appointmentid: string;
@@ -17,6 +17,7 @@ interface AppointmentStore {
     error: string | null;
     fetchAppointments: () => Promise<void>;
     cancel: (id: string) => Promise<void>;
+    create: (args: any) => Promise<void>;
 }
 
 export const useAppointmentStore = create<AppointmentStore>((set, get) => ({
@@ -54,4 +55,23 @@ export const useAppointmentStore = create<AppointmentStore>((set, get) => ({
             console.error('İptal başarısız:', err.message);
         }
     },
+    create: async ({
+        businessId,
+        servicesId,
+        staffId,
+        appointment_time
+    }: {
+        businessId: string;
+        servicesId: string;
+        staffId: string | null;
+        appointment_time: string;
+    }) => {
+        try {
+            const newAppointment = await createAppointment(businessId, servicesId, staffId, appointment_time);
+            set({ appointments: [...get().appointments, newAppointment] });
+        } catch (error: any) {
+            console.error('Randevu oluşturma hatası:', error.message);
+            throw error;
+        }
+    }
 }));

@@ -38,3 +38,33 @@ export const cancelAppointment = async (id: string) => {
         throw new Error('Randevu iptal edilemedi');
     }
 };
+export const createAppointment = async (
+    businessId: string,
+    servicesId: string,
+    staffId: string | null,
+    appointment_time: string
+) => {
+    const token = await AsyncStorage.getItem('accessToken');
+    if (!token) throw new Error('Yetki bilgisi bulunamadı.');
+
+    const response = await fetch(`${API_URL}/appointments`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+            businessId,
+            servicesId,
+            staffId,
+            appointment_time,
+        }),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Randevu oluşturulamadı');
+    }
+
+    return await response.json();
+};
