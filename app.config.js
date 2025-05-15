@@ -14,6 +14,7 @@ export default {
       supportsTablet: true,
     },
     android: {
+      package: 'com.elifep2.zivofrontend',
       adaptiveIcon: {
         foregroundImage: './assets/images/adaptive-icon.png',
         backgroundColor: '#ffffff',
@@ -41,7 +42,7 @@ export default {
       typedRoutes: true,
     },
     extra: {
-      API_URL: process.env.API_URL,
+      apiUrl: process.env.API_URL,
       eas: {
         projectId: "c8e6ff60-4bea-4784-9bc9-513e0c7f51e6"
       }
