@@ -6,11 +6,11 @@ import { useTranslation } from 'react-i18next';
 interface Props {
     selected: string;
     onSelect: (category: string) => void;
+    searchTerm: string;
+    onSearchChange: (text: string) => void;
 }
 
-
-
-export default function ExploreHeader({ selected, onSelect }: Props) {
+export default function ExploreHeader({ selected, onSelect, searchTerm, onSearchChange }: Props) {
     const { colors } = useAppTheme();
     const { t } = useTranslation();
 
@@ -23,6 +23,8 @@ export default function ExploreHeader({ selected, onSelect }: Props) {
                 <TextInput
                     placeholder={t('explore.searchPlaceholder')}
                     placeholderTextColor={colors.icon}
+                    value={searchTerm}
+                    onChangeText={onSearchChange}
                     style={[styles.input, { color: colors.text }]}
                 />
             </View>

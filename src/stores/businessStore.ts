@@ -9,6 +9,7 @@ interface Business {
     town: string;
     adressline1: string;
     image_url: string;
+    signed_url?: string;
 }
 
 interface BusinessState {
@@ -27,7 +28,7 @@ export const useBusinessStore = create<BusinessState>((set) => ({
             city: item.city,
             town: item.town,
             adressline1: item.adressline1,
-            image_url: item.image_url || 'https://cdn-icons-png.flaticon.com/512/2920/2920068.png',
+            image_url: item.signed_url || item.image_url || 'https://cdn-icons-png.flaticon.com/512/2920/2920068.png',
         }));
 
         set({ businesses: formatted }); // ✅ Artık "never" hatası almazsın

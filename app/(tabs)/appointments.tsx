@@ -14,9 +14,8 @@ import { useAppointmentStore } from '@/stores/appointmentStore'; // ✅ store'u 
 import { useServiceStore } from '@/stores/serviceStore';
 import { useBusinessStore } from '@/stores/businessStore';
 
-
 export default function AppointmentsScreen() {
-    const { colors, isDark } = useAppTheme();
+    const { colors } = useAppTheme();
     const router = useRouter();
     const { t, i18n } = useTranslation();
     const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -80,10 +79,6 @@ export default function AppointmentsScreen() {
         setTimeout(() => setCalendarReady(true), 50); // kısa bir bekleme ile yeniden render
     }, [i18n.language]);
 
-    console.log('Tüm randevular:', appointments);
-    console.log('Seçili gün:', selectedDate);
-    console.log('Filtrelenmiş randevular:', filteredAppointments);
-
     return (
         // <View style={{ flex: 1, backgroundColor: colors.background }}>
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
@@ -110,7 +105,7 @@ export default function AppointmentsScreen() {
                         key={i18n.language}
                         onDayPress={(day) => setSelectedDate(day.dateString)}
                         markedDates={{
-                            [selectedDate]: { selected: true, selectedColor: colors.primary },
+                            [selectedDate]: { selected: true, marked: true, selectedColor: colors.primary },
                         }}
                         theme={{
                             calendarBackground: colors.background,

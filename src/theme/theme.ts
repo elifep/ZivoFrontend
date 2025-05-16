@@ -8,6 +8,7 @@ export const themes = {
         border: '#DDDDDD',
         borderBottom: '#eee',
         icon: '#333333',
+        softicon: '#9A9A9A',
         searchBackground: '#f3f3f3',
         mutedText: '#999999',
         softButton: '#EEEEEE',
@@ -23,6 +24,7 @@ export const themes = {
         border: '#444444',
         borderBottom: '#FFFFFF',
         icon: '#AAAAAA', // daha koyu ton
+        softicon: '#9A9A9A',
         searchBackground: '#2A2A2A',
         mutedText: '#AAAAAA',
         softButton: '#333333',

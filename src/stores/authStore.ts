@@ -32,7 +32,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             accessToken: data.accessToken,
             refreshToken: data.refreshToken,
         });
-        console.log(data.user);
         await AsyncStorage.setItem('accessToken', data.accessToken);
         await AsyncStorage.setItem('refreshToken', data.refreshToken);
         await AsyncStorage.setItem('user', JSON.stringify(data.user));

@@ -1,7 +1,6 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { Feather, FontAwesome } from '@expo/vector-icons';
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { API_URL } from '@/config/config';
 
 interface Props {
   image_url: string;
@@ -23,39 +22,46 @@ export default function SalonCard({
   const { colors } = useAppTheme();
   const screenWidth = Dimensions.get('window').width;
 
+  const isLiked = liked ?? false;
+  const defaultImage = require('../../assets/images/salons/defaultimage.png');
+
+  const handleToggleLike = () => {
+    if (onToggleLike) {
+      onToggleLike();
+    }
+  };
+
   const cardStyle = [
     styles.card,
     { backgroundColor: colors.card },
     fullWidth && { width: screenWidth - 32, marginRight: 0 },
   ];
 
-  const imageSource = image_url?.startsWith('http')
-    ? image_url
-    : `${API_URL}/${image_url}`;
-
   return (
     <View style={cardStyle}>
       <View style={styles.imageWrapper}>
-        {image_url ? (
-          <Image source={{ uri: imageSource }} style={styles.image} />
-        ) : (
-          <View style={[styles.image, styles.imageFallback]}>
-            <Text style={{ color: '#000' }}>Resim Yok</Text>
-          </View>
-        )}
+
+          <Image
+            source={
+              image_url
+                ? { uri: image_url }
+                : defaultImage
+            }
+            style={styles.image}
+          />
 
         <TouchableOpacity
           style={[styles.heart, { backgroundColor: colors.background }]}
-          onPress={onToggleLike}
+          onPress={handleToggleLike}
         >
-          {liked ? (
+          {isLiked ? (
             <FontAwesome name="heart" size={18} color={colors.primary} />
           ) : (
             <Feather name="heart" size={18} color={colors.icon} />
           )}
         </TouchableOpacity>
 
-        <View style={[styles.ratingTopRight, { backgroundColor: colors.background }]}>
+        <View style={[styles.ratingTopRight, { backgroundColor: colors.background, borderColor: colors.border }]}>
           <Feather name="star" size={14} color={colors.text} />
           <Text style={[styles.ratingText, { color: colors.text }]}>5.0</Text>
         </View>
@@ -63,7 +69,7 @@ export default function SalonCard({
 
       <View style={styles.info}>
         <Text style={[styles.name, { color: colors.text }]}>{businessName}</Text>
-        <Text style={[styles.address, { color: colors.icon }]} numberOfLines={1}>
+        <Text style={[styles.address, { color: colors.icon }]} numberOfLines={2}>
           {adressline1}
         </Text>
       </View>
@@ -94,7 +100,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     left: 10,
-    padding: 6,
+    padding: 10, // artırıldı
     borderRadius: 20,
   },
   ratingTopRight: {

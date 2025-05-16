@@ -23,7 +23,7 @@ export default function SalonDetailsTab() {
             <View style={[styles.mapBox, { backgroundColor: colors.card }]}>
                 <Image source={require('../../assets/map-snapshot.png')} style={styles.mapImage} />
                 <View style={styles.mapInfo}>
-                    <Image source={require('../../assets/images/salons/rose-life-nisantasi.jpg')} style={styles.avatar} />
+                    <Image source={require('../../assets/images/salons/defaultimage.png')} style={styles.avatar} />
                     <View style={{ flex: 1 }}>
                         <Text style={[styles.salonName, { color: colors.text }]}>Rose Life Nişantaşı</Text>
                         <Text style={[styles.salonAddress, { color: colors.text }]}>34920 Vadi İstanbul Avrupa Yakası...</Text>

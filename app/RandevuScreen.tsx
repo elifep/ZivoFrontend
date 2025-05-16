@@ -24,7 +24,7 @@ export default function RandevuScreen() {
     const [availableTimes, setAvailableTimes] = useState<string[]>([]);
     const [selectedEmployee, setSelectedEmployee] = useState<string | null>('irem');
     const [showStaffModal, setShowStaffModal] = useState(false);
-    const [selectedDate, setSelectedDate] = useState<string>('2025-06-10');
+    const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
     const [selectedTime, setSelectedTime] = useState<string>('11:30');
     const [note, setNote] = useState('');
     const { services } = useServiceStore();
@@ -101,25 +101,26 @@ export default function RandevuScreen() {
                             style={[
                                 styles.farkEtmezButton,
                                 {
-                                    borderColor: selectedEmployee === null ? colors.primary :'white',
-                                    backgroundColor: selectedEmployee === null ? colors.primary : 'transparent',
+                                    borderColor: selectedEmployee === null ? colors.primary : colors.softicon,
+                                    backgroundColor: selectedEmployee === null ? colors.primary : colors.softicon,
                                 },
                             ]}
                             onPress={() => setSelectedEmployee(null)}
                         >
                             <Text style={{
-                                color: selectedEmployee === null ? colors.buttonText : colors.text, // ✅ seçildiyse açık tema yazı rengi
+                                color: selectedEmployee === null ? colors.buttonText : colors.buttonText,
+                                shadowColor: colors.primary,
                                 fontWeight: '500'
                             }}>
                                 {t('appointment_create.anyEmployee')}
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => setSelectedEmployee('irem')}>
-                            <Ionicons name="person-circle" size={50} color={selectedEmployee === 'irem' ? colors.primary : colors.icon} />
+                            <Ionicons name="person-circle" size={50} color={selectedEmployee === 'irem' ? colors.primary : colors.softicon} />
                             <Text style={[styles.employeeLabel, { color: colors.text }]}>İrem Taş</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => setSelectedEmployee('julide')}>
-                            <Ionicons name="person-circle" size={50} color={selectedEmployee === 'julide' ? colors.primary : colors.icon} />
+                            <Ionicons name="person-circle" size={50} color={selectedEmployee === 'julide' ? colors.primary : colors.softicon} />
                             <Text style={[styles.employeeLabel, { color: colors.text }]}>Jülide Aslan</Text>
                         </TouchableOpacity>
                     </View>
@@ -179,8 +180,8 @@ export default function RandevuScreen() {
                             <Text style={{ color: colors.text }}>
                                 {t('appointment_create.selectedEmployee')}: {selectedEmployee === null ? t('appointment_create.anyEmployee') : selectedEmployee === 'julide' ? 'Jülide Aslan' : 'İrem Taş'}
                             </Text>
-                            <TouchableOpacity style={styles.editButton} onPress={() => setShowStaffModal(true)}>
-                                <Text style={{ fontSize: 12 }}>{t('appointment_create.change')}</Text>
+                            <TouchableOpacity style={[styles.editButton, { backgroundColor: colors.primary }]} onPress={() => setShowStaffModal(true)}>
+                                <Text style={{ color: colors.buttonText, fontWeight: 'bold', fontSize: 12 }}>{t('appointment_create.change')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
