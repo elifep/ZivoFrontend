@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, TextInput, StatusBar } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import ReviewTab from '@/components/ReviewTab'; // 📌 Yorumlar için komponent import edildi
@@ -33,10 +33,6 @@ export default function SalonDetailScreen() {
     }, [salonData?.businessId]);
     return (
         <View style={{ flex: 1, backgroundColor: colors.background }}>
-            <StatusBar
-                backgroundColor={colors.background}
-                barStyle={isDark ? 'light-content' : 'dark-content'}
-            />
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
                 {/* Salon Görseli */}
                 <View style={styles.imageContainer}>

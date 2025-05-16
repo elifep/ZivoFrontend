@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, ScrollView, FlatList, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, Platform } from 'react-native';
+import { View, ScrollView, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import ExploreHeader from '@/components/ExploreHeader';
 import FilterRow from '@/components/FilterRow';
 import SalonCard from '@/components/SalonCard';
@@ -41,9 +41,8 @@ export default function IndexScreen() {
     <SafeAreaView style={{
       flex: 1,
       backgroundColor: '#000',
-      paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+      paddingTop: 12
     }}>
-      <StatusBar backgroundColor={colors.background} translucent={false} />
       <ScrollView style={{ backgroundColor: colors.background }}>
         <ExploreHeader selected={selectedCategory} onSelect={setSelectedCategory} />
         <FilterRow />

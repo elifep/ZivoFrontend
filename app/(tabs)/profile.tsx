@@ -84,128 +84,191 @@ export default function ProfilimScreen() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-            <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-                <Text style={[styles.title, { color: colors.text }]}>Profilim</Text>
-
-                <View style={styles.imageContainer}>
-                    {form.image || profile?.signed_url ? (
-                        <TouchableOpacity onPress={() => setPreviewVisible(true)}>
-                            <Image source={{ uri: form.image?.uri || profile?.signed_url }} style={styles.image} />
-                            <TouchableOpacity onPress={pickImage} style={styles.imageEditIcon}>
-                                <Ionicons name="camera" size={24} color="#fff" />
-                            </TouchableOpacity>
-                        </TouchableOpacity>
-                    ) : (
-                        <TouchableOpacity onPress={() => setPreviewVisible(true)}>
-                            <TouchableOpacity onPress={pickImage} style={styles.imageEditIcon}>
-                                <Ionicons name="camera" size={22} color="#fff" />
-                            </TouchableOpacity>
-                            <Ionicons name="person-circle-outline" size={120} color={colors.icon} />
-                        </TouchableOpacity>
-                    )}
-
-
-                </View>
-
-                <TextInput
-                    placeholder="Ad Soyad"
-                    placeholderTextColor={colors.mutedText}
-                    value={form.full_name}
-                    onChangeText={(text) => setForm((f) => ({ ...f, full_name: text }))}
-                    style={[styles.input, { borderColor: colors.border, color: colors.text }]}
-                />
-                <TextInput
-                    placeholder="Telefon"
-                    placeholderTextColor={colors.mutedText}
-                    value={form.phone}
-                    onChangeText={(text) => setForm((f) => ({ ...f, phone: text }))}
-                    keyboardType="phone-pad"
-                    style={[styles.input, { borderColor: colors.border, color: colors.text }]}
-                />
-                <TouchableOpacity onPress={() => setShowDatePicker(true)} style={[styles.input, { borderColor: colors.border }]}>
-                    <Text style={{ color: form.birthday ? colors.text : colors.mutedText }}>
-                        {form.birthday ? moment(form.birthday).format('DD.MM.YYYY') : 'Doğum Tarihi Seç'}
-                    </Text>
-                </TouchableOpacity>
-
-                {showDatePicker && (
-                    <DateTimePicker
-                        value={form.birthday ? new Date(form.birthday) : new Date()}
-                        mode="date"
-                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                        onChange={(event, selectedDate) => {
-                            setShowDatePicker(false);
-                            if (selectedDate) {
-                                const dateString = selectedDate.toISOString().split('T')[0];
-                                setForm((f) => ({ ...f, birthday: dateString }));
-                            }
-                        }}
-                    />
-                )}
-
-                <View style={[styles.input, { borderColor: colors.border }, { padding: 0 }]}>
-                    <Picker
-                        selectedValue={form.gender}
-                        onValueChange={(itemValue) => setForm((f) => ({ ...f, gender: itemValue }))}
-                        style={{ color: colors.text }}
-                        dropdownIconColor={colors.icon}
-                    >
-                        <Picker.Item label="Cinsiyet Seçin" value="" color={colors.mutedText} />
-                        <Picker.Item label="Kadın" value="Kadın" />
-                        <Picker.Item label="Erkek" value="Erkek" />
-                        <Picker.Item label="Diğer" value="Diğer" />
-                    </Picker>
-                </View>
-
-                <TextInput
-                    placeholder="Adres"
-                    placeholderTextColor={colors.mutedText}
-                    value={form.address}
-                    onChangeText={(text) => setForm((f) => ({ ...f, address: text }))}
-                    style={[styles.input, { borderColor: colors.border, color: colors.text }]}
-                />
-
-                <TouchableOpacity onPress={handleSave} style={[styles.saveBtn, { backgroundColor: colors.primary }]}>
-                    <Text style={{ color: colors.buttonText }}>KAYDET</Text>
-                </TouchableOpacity>
-                {previewVisible && (// resim açılınca olan modal
-                    <TouchableWithoutFeedback onPress={() => setPreviewVisible(false)}>
-                        <View style={styles.modalOverlay}>
-                            <View style={styles.modalContent}>
-                                <Image
-                                    source={{ uri: form.image?.uri || profile?.signed_url }}
-                                    style={styles.previewImage}
-                                    resizeMode="contain"
-                                />
-
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        setForm((prev) => ({ ...prev, image: undefined }));
-                                        setPreviewVisible(false);
-                                    }}
-                                    style={styles.deleteIconBtn}
-                                >
-                                    <Ionicons name="trash" size={28} color="#fff" />
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
+            <ScrollView style={[styles.container, { backgroundColor: '#000' }]}>
+                <Text style={[styles.title, { color: '#fff' }]}>{t('profile.title')}</Text>
+                <View style={{
+                    backgroundColor: '#000',
+                    padding: 16,
+                    borderRadius: 12,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 4,
+                    elevation: 4,
+                    marginBottom: 24
+                }}>
+                    <View style={{
+                        backgroundColor: colors.card,
+                        padding: 16,
+                        borderRadius: 12,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 4 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 4,
+                        elevation: 4,
+                        marginBottom: 24
+                    }}>
+                        <View style={styles.imageContainer}>
+                            {form.image || profile?.signed_url ? (
+                                <TouchableOpacity onPress={() => setPreviewVisible(true)}>
+                                    <Image source={{ uri: form.image?.uri || profile?.signed_url }} style={styles.image} />
+                                    <TouchableOpacity onPress={pickImage} style={styles.imageEditIcon}>
+                                        <Ionicons name="camera" size={24} color="#fff" />
+                                    </TouchableOpacity>
                                 </TouchableOpacity>
-                                <TouchableOpacity
-                                    onPress={pickImage}
-                                    style={styles.editIconBtn}
-                                >
-                                    <Ionicons name="camera" size={28} color="#fff" />
+                            ) : (
+                                <TouchableOpacity onPress={() => setPreviewVisible(true)}>
+                                    <TouchableOpacity onPress={pickImage} style={styles.imageEditIcon}>
+                                        <Ionicons name="camera" size={22} color="#fff" />
+                                    </TouchableOpacity>
+                                    <Ionicons name="person-circle-outline" size={120} color={colors.icon} />
                                 </TouchableOpacity>
-                            </View>
+                            )}
                         </View>
-                    </TouchableWithoutFeedback>
-                )}
-                <Text style={[styles.sectionTitle, { color: colors.icon }]}>Tema Seçimi</Text>
-                <ThemePicker />
 
-                <Text style={[styles.sectionTitle, { color: colors.icon }]}>Dil Seçimi</Text>
-                <LanguagePicker />
 
-                <View style={{ marginTop: 20 }}>
-                    <Button title="Çıkış Yap" onPress={handleLogout} color="#e53935" />
+                        <TextInput
+                            placeholder={t('profile.name')}
+                            placeholderTextColor={colors.mutedText}
+                            value={form.full_name}
+                            onChangeText={(text) => setForm((f) => ({ ...f, full_name: text }))}
+                            style={[styles.input, { borderColor: colors.border, color: colors.text }]}
+                        />
+                        <TextInput
+                            placeholder={t('profile.phone')}
+                            placeholderTextColor={colors.mutedText}
+                            value={form.phone}
+                            onChangeText={(text) => setForm((f) => ({ ...f, phone: text }))}
+                            keyboardType="phone-pad"
+                            style={[styles.input, { borderColor: colors.border, color: colors.text }]}
+                        />
+                        <TouchableOpacity onPress={() => setShowDatePicker(true)} style={[styles.input, { borderColor: colors.border }]}>
+                            <Text style={{ color: form.birthday ? colors.text : colors.mutedText }}>
+                                {form.birthday ? moment(form.birthday).format('DD.MM.YYYY') : 'Doğum Tarihi Seç'}
+                            </Text>
+                        </TouchableOpacity>
+
+                        {showDatePicker && (
+                            <DateTimePicker
+                                value={form.birthday ? new Date(form.birthday) : new Date()}
+                                mode="date"
+                                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                                onChange={(event, selectedDate) => {
+                                    setShowDatePicker(false);
+                                    if (selectedDate) {
+                                        const dateString = selectedDate.toISOString().split('T')[0];
+                                        setForm((f) => ({ ...f, birthday: dateString }));
+                                    }
+                                }}
+                            />
+                        )}
+
+                        <View style={[styles.input, { borderColor: colors.border }, { padding: 0 }]}>
+                            <Picker
+                                selectedValue={form.gender}
+                                onValueChange={(itemValue) => setForm((f) => ({ ...f, gender: itemValue }))}
+                                style={{ color: colors.text }}
+                                dropdownIconColor={colors.icon}
+                            >
+                                <Picker.Item label={t('profile.selectGender')} value="" color={colors.mutedText} />
+                                <Picker.Item label={t('profile.female')} value="Kadın" />
+                                <Picker.Item label={t('profile.male')} value="Erkek" />
+                                <Picker.Item label={t('profile.other')} value="Diğer" />
+                            </Picker>
+                        </View>
+
+                        <TextInput
+                            placeholder={t('profile.address')}
+                            placeholderTextColor={colors.mutedText}
+                            value={form.address}
+                            onChangeText={(text) => setForm((f) => ({ ...f, address: text }))}
+                            style={[styles.input, { borderColor: colors.border, color: colors.text }]}
+                        />
+                        <TouchableOpacity onPress={handleSave} style={[styles.saveBtn, { backgroundColor: colors.primary }]}>
+                            <Text style={{ color: colors.buttonText }}>{t('profile.save')}</Text>
+                        </TouchableOpacity>
+                    </View>
+                    {previewVisible && (// resim açılınca olan modal
+                        <TouchableWithoutFeedback onPress={() => setPreviewVisible(false)}>
+                            <View style={styles.modalOverlay}>
+                                <View style={styles.modalContent}>
+                                    <Image
+                                        source={{ uri: form.image?.uri || profile?.signed_url }}
+                                        style={styles.previewImage}
+                                        resizeMode="contain"
+                                    />
+
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            setForm((prev) => ({ ...prev, image: undefined }));
+                                            setPreviewVisible(false);
+                                        }}
+                                        style={styles.deleteIconBtn}
+                                    >
+                                        <Ionicons name="trash" size={28} color="#fff" />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={pickImage}
+                                        style={styles.editIconBtn}
+                                    >
+                                        <Ionicons name="camera" size={28} color="#fff" />
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </TouchableWithoutFeedback>
+                    )}
+                    <View style={{
+                        backgroundColor: colors.card,
+                        padding: 16,
+                        borderRadius: 12,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 4 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 4,
+                        elevation: 4,
+                        marginBottom: 24
+                    }}>
+                        <View style={{
+                            backgroundColor: colors.card,
+                            padding: 12,
+                            borderRadius: 10,
+                            marginBottom: 20
+                        }}>
+                            <Text style={{ color: colors.text, fontWeight: '600', marginBottom: 8 }}>
+                                🌙 {t('Tema Seçimi')}
+                            </Text>
+                            <ThemePicker />
+                        </View>
+
+                        <View style={{
+                            backgroundColor: colors.card,
+                            padding: 12,
+                            borderRadius: 10,
+                            marginBottom: 20
+                        }}>
+                            <Text style={{ color: colors.text, fontWeight: '600', marginBottom: 8 }}>
+                                🌍 {t('Dil Seçimi')}
+                            </Text>
+                            <LanguagePicker />
+                        </View>
+
+                    </View>
+                    <TouchableOpacity
+                        onPress={handleLogout}
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: '#e53935',
+                            paddingVertical: 12,
+                            borderRadius: 8,
+                            marginTop: 10
+                        }}
+                    >
+                        <Ionicons name="log-out-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
+                        <Text style={{ color: '#fff', fontWeight: '600' }}>{t('Çıkış Yap')}</Text>
+                    </TouchableOpacity>
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -214,14 +277,15 @@ export default function ProfilimScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        padding: 16,
+        marginHorizontal: 16,
+        paddingVertical: 16,
     },
     title: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: 'bold',
         marginBottom: 20,
         alignContent: 'center',
+        textAlign: 'center',
     },
     imageContainer: {
         alignItems: 'center',

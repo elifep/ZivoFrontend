@@ -1,17 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { useTranslation } from 'react-i18next';
 
 export default function ThemePicker() {
     const { theme, setTheme, colors } = useAppTheme();
-
+    const { t } = useTranslation();
     const [open, setOpen] = useState<boolean>(false);
     const [value, setValue] = useState(theme);
     const [items, setItems] = useState([
-        { label: 'Açık Tema', value: 'light' },
-        { label: 'Koyu Tema', value: 'dark' },
+        { label: t('profile.light') , value: 'light' },
+        { label: t('profile.dark'), value: 'dark' },
     ]);
+    useEffect(() => {
+      setItems([
+        { label: t('profile.light') , value: 'light' },
+        { label: t('profile.dark'), value: 'dark' },
+      ])
+    }, [t])
 
     return (
         <View style={{ zIndex: open ? 10 : 1, position: 'relative' }}>

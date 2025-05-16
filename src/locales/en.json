@@ -10,7 +10,8 @@
         "profile": "Profile"
     },
     "favourites": {
-        "title": "My Favourite Salons"
+        "title": "My Favourite Salons",
+        "empty": "No salons have been added to favorites yet."
     },
     "appointments": {
         "title": "Appointments",
@@ -23,6 +24,28 @@
         "status_active": "Active",
         "status_cancelled": "Cancelled",
         "status_past": "Past"
+    },
+    "appointment_create": {
+        "title": "Book Appointment",
+        "selectEmployee": "Select Employee",
+        "anyEmployee": "Doesn’t Matter",
+        "addNote": "Leave a Note",
+        "saveNote": "Save",
+        "addService": "Add Service",
+        "change": "Change",
+        "selectedEmployee": "Employee",
+        "selectDate": "Select Date",
+        "selectTime": "Select Time",
+        "confirm": "Confirm Appointment",
+        "price": "Price",
+        "duration": "Duration",
+        "close": "Close",
+        "notePlaceholder": "Example: I want a bob cut",
+        "successTitle": "Appointment Created",
+        "successMessage": "Your appointment has been successfully created.",
+        "errorTitle": "Error",
+        "errorMissing": "Missing service or business information.",
+        "errorGeneric": "Could not create appointment."
     },
     "buttons": {
         "edit": "Edit",
@@ -42,7 +65,13 @@
         "light": "Light Theme",
         "dark": "Dark Theme",
         "language": "Language Selection",
-        "save": "Save"
+        "save": "Save",
+        "logout": "Log Out",
+        "selectGender": "Select Gender",
+        "female": "Female",
+        "male": "Male",
+        "other": "Other",
+        "selectDate": "Select Birth Date"
     },
     "auth": {
         "welcome": "WELCOME",

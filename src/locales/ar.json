@@ -10,7 +10,8 @@
         "profile": "الملف الشخصي"
     },
     "favourites": {
-        "title": "صالوناتي المفضلة"
+        "title": "صالوناتي المفضلة",
+        "empty": "لا يوجد صالونات مضافة إلى المفضلة حتى الآن."
     },
     "appointments": {
         "title": "المواعيد",
@@ -23,6 +24,28 @@
         "status_active": "نشط",
         "status_cancelled": "ملغى",
         "status_past": "منتهي"
+    },
+    "appointment_create": {
+        "title": "احجز موعدًا",
+        "selectEmployee": "اختر الموظف",
+        "anyEmployee": "لا يهم",
+        "addNote": "اترك ملاحظة",
+        "saveNote": "حفظ",
+        "addService": "أضف خدمة",
+        "change": "تغيير",
+        "selectedEmployee": "الموظف",
+        "selectDate": "اختر التاريخ",
+        "selectTime": "اختر الوقت",
+        "confirm": "تأكيد الموعد",
+        "price": "السعر",
+        "duration": "المدة",
+        "close": "إغلاق",
+        "notePlaceholder": "مثال: أريد قص شعري قص بوب",
+        "successTitle": "تم إنشاء الموعد",
+        "successMessage": "تم حجز موعدك بنجاح.",
+        "errorTitle": "خطأ",
+        "errorMissing": "بيانات الخدمة أو النشاط التجاري غير مكتملة.",
+        "errorGeneric": "تعذر إنشاء الموعد."
     },
     "buttons": {
         "edit": "تعديل",
@@ -42,7 +65,13 @@
         "light": "المظهر الفاتح",
         "dark": "المظهر الداكن",
         "language": "اختيار اللغة",
-        "save": "حفظ"
+        "save": "حفظ",
+        "logout": "تسجيل الخروج",
+        "selectGender": "اختر الجنس",
+        "female": "أنثى",
+        "male": "ذكر",
+        "other": "آخر",
+        "selectDate": "اختر تاريخ الميلاد"
     },
     "auth": {
         "welcome": "أهلاً وسهلاً",

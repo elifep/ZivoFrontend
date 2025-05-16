@@ -8,7 +8,6 @@ import { LocaleConfig } from 'react-native-calendars';
 import { useTranslation } from 'react-i18next';
 import { setupCalendarLocales } from '@/config/calendarLocales';
 import { formatDate } from '@/config/date';
-import { StatusBar } from 'expo-status-bar';
 import { format } from 'date-fns'; // en üstte
 import { useRouter } from 'expo-router';
 import { useAppointmentStore } from '@/stores/appointmentStore'; // ✅ store'u çağır
@@ -88,7 +87,6 @@ export default function AppointmentsScreen() {
     return (
         // <View style={{ flex: 1, backgroundColor: colors.background }}>
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-            <StatusBar style={isDark ? 'light' : 'dark'} backgroundColor={colors.background} translucent={false} />
 
             <Text
                 style={{

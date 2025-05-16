@@ -4,7 +4,6 @@ import { Calendar } from 'react-native-calendars';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { StatusBar } from 'expo-status-bar';
 
 export default function EditAppointmentScreen() {
     const router = useRouter();

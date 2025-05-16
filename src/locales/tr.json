@@ -10,7 +10,8 @@
     "profile": "Profil"
   },
   "favourites": {
-    "title": "Favori Salonlarım"
+    "title": "Favori Salonlarım",
+    "empty": "Henüz favorilere eklenmiş salon yok."
   },
   "appointments": {
     "title": "Randevular",
@@ -23,6 +24,28 @@
     "status_active": "Aktif",
     "status_cancelled": "İptal Edildi",
     "status_past": "Geçmiş"
+  },
+  "appointment_create": {
+    "title": "Randevu Al",
+    "selectEmployee": "Çalışan Seçin",
+    "anyEmployee": "Fark Etmez",
+    "addNote": "Not Bırak",
+    "saveNote": "Kaydet",
+    "addService": "Hizmet Ekle",
+    "change": "Değiştir",
+    "selectedEmployee": "Çalışan",
+    "selectDate": "Tarih Seçin",
+    "selectTime": "Saat Seçin",
+    "confirm": "Randevuyu Onayla",
+    "price": "Ücret",
+    "duration": "Süre",
+    "close": "Kapat",
+    "notePlaceholder": "Örnek: Saçımı küt istiyorum",
+    "successTitle": "Randevu Oluşturuldu",
+    "successMessage": "Randevunuz başarıyla oluşturuldu.",
+    "errorTitle": "Hata",
+    "errorMissing": "Hizmet veya işletme bilgisi eksik.",
+    "errorGeneric": "Randevu oluşturulamadı."
   },
   "buttons": {
     "edit": "Düzenle",
@@ -42,7 +65,13 @@
     "light": "Açık Tema",
     "dark": "Koyu Tema",
     "language": "Dil Seçimi",
-    "save": "Kaydet"
+    "save": "Kaydet",
+    "logout": "Çıkış Yap",
+    "selectGender": "Cinsiyet Seçin",
+    "female": "Kadın",
+    "male": "Erkek",
+    "other": "Diğer",
+    "selectDate": "Doğum Tarihi Seç"
   },
   "auth": {
     "welcome": "HOŞ GELDİNİZ",

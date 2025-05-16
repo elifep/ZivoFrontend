@@ -24,7 +24,7 @@ export default function ReviewTab() {
         <View style={[{ padding: 16 }, { backgroundColor: colors.background }, { flex: 1 }]}>
             {/* Ortalama Puan */}
             {/* İçerikler */}
-            <View style={{ padding: 16, alignItems: 'center',borderBottomColor:colors.borderBottom }}>
+            <View style={styles.ratingBox}>
                 <View style={styles.ratingRow}>
                     <Text style={styles.ratingNumber}>
                         4,5<Text style={styles.outOfFive}>/5</Text>
@@ -32,14 +32,17 @@ export default function ReviewTab() {
 
                     <View style={styles.starsContainer}>
                         {[1, 2, 3, 4].map((i) => (
-                            <Ionicons key={i} name="star" size={32} color="#F7C429" />
+                            <Ionicons key={i} name="star" size={24} color="#000" />
                         ))}
-                        <Ionicons name="star-half" size={32} color="#F7C429" />
+                        <Ionicons name="star-half" size={24} color="#000" />
                     </View>
                 </View>
 
-                <Text style={styles.totalReviews}>{totalReviews.toLocaleString()}+ Değerlendirme</Text>
+                <Text style={styles.totalReviews}>
+                    {totalReviews.toLocaleString()}+ Değerlendirme
+                </Text>
             </View>
+
 
             {/* Filtre Butonları */}
             <Text style={styles.reviewTitle}>Değerlendirmeler</Text>
@@ -100,29 +103,44 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         alignItems: 'center',
     },
+    ratingBox: {
+        backgroundColor: '#fff',
+        padding: 16,
+        marginBottom: 16,
+        borderRadius: 12,
+        width: '100%',
+        alignSelf: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 4, // Android için gölge
+    },
     ratingRow: {
         flexDirection: 'row',
-        alignItems: 'center',
         justifyContent: 'center',
+        alignItems: 'center',
+        gap: 8,
+        marginBottom: 8,
     },
     ratingNumber: {
-        fontSize: 30,
+        fontSize: 28,
         fontWeight: 'bold',
-        color: '#fff',
-        marginRight: 12,
+        color: '#000',
     },
     outOfFive: {
         fontSize: 16,
-        fontWeight: 'normal',
-        color: '#fff',   // beyaz oldu
+        fontWeight: '400',
+        color: '#888',
     },
     starsContainer: {
         flexDirection: 'row',
     },
     totalReviews: {
         fontSize: 12,
-        marginTop: 8,
-        color: '#ddd',   // açık beyazımsı oldu
+        marginTop: 6,
+        color: '#666',
+        textAlign: 'center',
     },
     barRow: {
         flexDirection: 'row',
