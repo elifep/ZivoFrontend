@@ -84,19 +84,11 @@ export default function ProfilimScreen() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
-            <ScrollView style={[styles.container, { backgroundColor: '#000' }]}>
-                <Text style={[styles.title, { color: '#fff' }]}>{t('profile.title')}</Text>
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, paddingTop: Platform.OS === 'ios' ? 0 : 0 }}>
+            <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+                <Text style={[styles.title, { color: colors.text }]}>{t('profile.title')}</Text>
                 <View style={{
-                    backgroundColor: '#000',
                     padding: 16,
-                    borderRadius: 12,
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 4,
-                    elevation: 4,
-                    marginBottom: 24
                 }}>
                     <View style={{
                         backgroundColor: colors.card,
@@ -263,7 +255,8 @@ export default function ProfilimScreen() {
                             backgroundColor: '#e53935',
                             paddingVertical: 12,
                             borderRadius: 8,
-                            marginTop: 10
+                            marginTop: 10,
+                            marginBottom: 20
                         }}
                     >
                         <Ionicons name="log-out-outline" size={20} color="#fff" style={{ marginRight: 8 }} />

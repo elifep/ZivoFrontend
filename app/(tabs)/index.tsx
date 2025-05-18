@@ -64,7 +64,7 @@ export default function IndexScreen() {
   }, [searchTerm, salons, services]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#000', paddingTop:12}}>
       <ScrollView style={{ backgroundColor: colors.background }}>
         <ExploreHeader
           selected={selectedCategory}
