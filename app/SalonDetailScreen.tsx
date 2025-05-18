@@ -128,7 +128,7 @@ export default function SalonDetailScreen() {
                 )}
 
                 {selectedTab === t('salonDetail.tabs.reviews') && (
-                    <ReviewTab />
+                    <ReviewTab salonData={salonData} />
                 )}
 
                 {selectedTab === t('salonDetail.tabs.portfolio') && (

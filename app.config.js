@@ -12,6 +12,9 @@ export default {
     newArchEnabled: true,
     ios: {
       supportsTablet: true,
+      config: {
+        googleMapsApiKey: process.env.IOS_MAPS_API_KEY
+      }
     },
     android: {
       package: 'com.elifep2.zivofrontend',
@@ -19,6 +22,11 @@ export default {
         foregroundImage: './assets/images/adaptive-icon.png',
         backgroundColor: '#ffffff',
       },
+      config: {
+        googleMaps: {
+          apiKey: process.env.GOOGLE_MAPS_API_KEY
+        }
+      }
     },
     web: {
       bundler: 'metro',
@@ -43,6 +51,8 @@ export default {
     },
     extra: {
       apiUrl: process.env.API_URL,
+      apiKey: process.env.GOOGLE_MAPS_API_KEY,
+      googleMapsApiKey: process.env.IOS_MAPS_API_KEY,
       eas: {
         projectId: "c8e6ff60-4bea-4784-9bc9-513e0c7f51e6"
       }

@@ -33,7 +33,7 @@ export default function SalonCard({
 
   const cardStyle = [
     styles.card,
-    { backgroundColor: colors.card },
+    { backgroundColor: colors.cardd },
     fullWidth && { width: screenWidth - 32, marginRight: 0 },
   ];
 
@@ -41,14 +41,14 @@ export default function SalonCard({
     <View style={cardStyle}>
       <View style={styles.imageWrapper}>
 
-          <Image
-            source={
-              image_url
-                ? { uri: image_url }
-                : defaultImage
-            }
-            style={styles.image}
-          />
+        <Image
+          source={
+            image_url
+              ? { uri: image_url }
+              : defaultImage
+          }
+          style={styles.image}
+        />
 
         <TouchableOpacity
           style={[styles.heart, { backgroundColor: colors.background }]}
@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
     marginRight: 16,
     borderRadius: 12,
     overflow: 'hidden',
+    elevation: 5,
   },
   imageWrapper: {
     position: 'relative',

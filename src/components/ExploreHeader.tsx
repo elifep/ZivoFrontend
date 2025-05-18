@@ -2,6 +2,8 @@ import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity } from 
 import { Feather } from '@expo/vector-icons';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useTranslation } from 'react-i18next';
+import React from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface Props {
     selected: string;
@@ -16,7 +18,7 @@ export default function ExploreHeader({ selected, onSelect, searchTerm, onSearch
 
     const categories = [t('explore.categories.all'), t('explore.categories.hair'), t('explore.categories.nail'), t('explore.categories.skin')];
     return (
-        <View style={[{ padding: 8, paddingTop: 16 }, { backgroundColor: '#000000' }]}>
+        <SafeAreaView style={[{ padding: 8, paddingTop: 16 }, { backgroundColor: '#000000' }]}>
             {/* Arama Kutusu */}
             <View style={[styles.searchBox, { backgroundColor: colors.searchBackground }]}>
                 <Feather name="search" size={18} color={colors.icon} style={{ marginRight: 8 }} />
@@ -64,7 +66,7 @@ export default function ExploreHeader({ selected, onSelect, searchTerm, onSearch
                     </TouchableOpacity>
                 ))}
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 }
 

@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useServiceStore } from '@/stores/serviceStore';
 import { useFavouriteStore } from '@/stores/favouriteStore';
 import * as Animatable from 'react-native-animatable';
+import { Ionicons } from '@expo/vector-icons'; // veya Feather, FontAwesome gibi
 
 export default function IndexScreen() {
   const [salons, setSalons] = useState<any[]>([]);
@@ -22,8 +23,9 @@ export default function IndexScreen() {
   const router = useRouter();
   const { fetchServices, services } = useServiceStore();
   const { fetchFavourites, toggleFavourite, isFavourited } = useFavouriteStore();
-
+  const [isReady, setIsReady] = useState(false);
   useEffect(() => {
+    setIsReady(true);
     setIsLoading(true);
     fetchFavourites();
 
@@ -62,7 +64,7 @@ export default function IndexScreen() {
   }, [searchTerm, salons, services]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#000', paddingTop: 12 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
       <ScrollView style={{ backgroundColor: colors.background }}>
         <ExploreHeader
           selected={selectedCategory}
@@ -114,6 +116,22 @@ export default function IndexScreen() {
           </Text>
         )}
       </ScrollView>
+      {isReady && (
+        <TouchableOpacity
+          onPress={() => {
+            try {
+              router.push('/MapScreen');
+            } catch (err) {
+              console.log('Map yönlendirme hatası:', err);
+            }
+          }}
+          style={styles.floatingMapButton}
+        >
+          <Ionicons name="map-outline" size={20} color="white" />
+          <Text style={styles.mapButtonText}>Map</Text>
+        </TouchableOpacity>
+      )}
+
     </SafeAreaView>
   );
 }
@@ -130,5 +148,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 60,
+  },
+  floatingMapButton: {
+    position: 'absolute',
+    bottom: 30, // tab bar'ın üstü
+    right: 30,
+    backgroundColor: 'black',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 999,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  mapButtonText: {
+    color: 'white',
+    marginLeft: 8,
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

@@ -14,11 +14,15 @@ interface Business {
 
 interface BusinessState {
     businesses: Business[];
+    selectedBusiness?: Business;
     fetchBusinesses: () => Promise<Business[]>; // ✅ Artık return tipi doğru
+    setSelectedBusiness: (business: Business) => void;
 }
 
 export const useBusinessStore = create<BusinessState>((set) => ({
     businesses: [],
+    selectedBusiness: undefined,
+
     fetchBusinesses: async (): Promise<Business[]> => {
         const rawData = await businessService.getAllBusinesses();
 
@@ -34,4 +38,6 @@ export const useBusinessStore = create<BusinessState>((set) => ({
         set({ businesses: formatted }); // ✅ Artık "never" hatası almazsın
         return formatted;
     },
+    setSelectedBusiness: (business) => set({ selectedBusiness: business }),
+
 }));

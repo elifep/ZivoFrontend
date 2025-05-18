@@ -5,6 +5,7 @@ export const themes = {
         text: '#000000',
         primary: '#000000',
         card: '#F8F8F8',
+        cardd: '#F4F4F4',
         border: '#DDDDDD',
         borderBottom: '#eee',
         icon: '#333333',
@@ -21,6 +22,7 @@ export const themes = {
         text: '#FFFFFF',
         primary: '#FFFFFF',
         card: '#1A1A1A',
+        cardd: '#1A1A1A',
         border: '#444444',
         borderBottom: '#FFFFFF',
         icon: '#AAAAAA', // daha koyu ton

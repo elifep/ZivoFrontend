@@ -1,73 +1,337 @@
-import { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Image, ScrollView } from 'react-native';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { useAppTheme } from '@/hooks/useAppTheme';
+import { useReviewStore } from '@/stores/reviewStore';
+import { useProfileStore } from '@/stores/profileStore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
+import { jwtDecode } from 'jwt-decode';
+import { Modal } from 'react-native';
 
-const reviews = [
-    { id: '1', name: 'Beyza Eprimez', rating: 3, date: '12.05.2024, 10:10', comment: 'Beklediğim kadar güzel değildi ama iyiydi. 3 yıldızı hak etti.' },
-    { id: '2', name: 'Elif Ep', rating: 4, date: '21 Mart 2024, 15:22', comment: 'Gayet güzeldi ve 4 yıldız hak etti. Saç kesimi oldukça iyiydi.' },
-    { id: '3', name: 'Fatmanur Ergen', rating: 5, date: '4 Şubat 2024, 22:40', comment: 'Çalışanlar ilgiliydi ve işlemden çok memnun kaldım.' },
-    { id: '4', name: 'Zeynep Erdoğan', rating: 4, date: '2 Şubat 2024, 23:25', comment: 'Gayet iyiydi. Teşekkürler.' },
-    { id: '5', name: 'Zehra Kum', rating: 5, date: '17 Ocak 2024, 13:17', comment: 'Jülide Hanıma saç kestirdim, çok memnun kaldım.' },
-    { id: '6', name: 'Selenay Atcı', rating: 2, date: '10 Ocak 2024, 15:10', comment: 'İşlemden pek memnun kalmadım.' },
-    { id: '7', name: 'Öznur Mantarcı', rating: 5, date: '4 Ocak 2024, 13:00', comment: 'Her şey çok güzeldi.' },
-];
+export const getUserIdFromToken = async (): Promise<string | null> => {
+    const token = await AsyncStorage.getItem('accessToken');
+    if (!token) return null;
 
-const totalReviews = 45000;
-const sortOptions = ['En İyi Değerlendirmeler', 'Yeniden Eskiye', 'Puana Göre'];
+    try {
+        const decoded: any = jwtDecode(token);
+        return decoded.userId || null;
+    } catch (error) {
+        console.error('Token çözümlenemedi:', error);
+        return null;
+    }
+};
+const sortOptions = ['En İyi Değerlendirmeler', 'Yeniden Eskiye', 'Puana Göre', 'En Eski'];
 
-export default function ReviewTab() {
+interface DisplayReview {
+    id: string;
+    userId: string;
+    name: string;
+    avatar?: string | null;
+    rating: number;
+    date: string;
+    comment: string;
+}
+interface ReviewTabProps {
+    salonData: {
+        businessId: string;
+        businessName: string;
+        image_url?: string;
+        adressline1?: string;
+        // ihtiyaca göre diğer alanlar
+    };
+}
+export default function ReviewTab({ salonData }: ReviewTabProps) {
     const { colors } = useAppTheme();
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const businessId = salonData.businessId;
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     const [selectedSort, setSelectedSort] = useState('Yeniden Eskiye');
+    const { average, total, fetchReviews, addReview } = useReviewStore();
+    const { profile, fetchProfile } = useProfileStore();
+    const [comment, setComment] = useState('');
+    const [rating, setRating] = useState(0);
+    const [businessReviews, setBusinessReviews] = useState<DisplayReview[]>([]);
+    const { removeReview, editReview } = useReviewStore();
+    const [selectedToDelete, setSelectedToDelete] = useState<string | null>(null);
+
+    useEffect(() => {
+        fetchProfile();
+    }, []);
+    useEffect(() => {
+        getUserIdFromToken().then((id) => setCurrentUserId(id));
+
+        if (!businessId) return;
+
+        fetchReviews(businessId).then(() => {
+            const reviewState = useReviewStore.getState().reviews;
+            const formatted = reviewState.map((r) => ({
+                id: r.reviewsId,
+                userId: r.userId,
+                name: r.user?.full_name || 'Kullanıcı',
+                avatar: r.user?.image_url || null,
+                rating: r.rating,
+                date: new Date(r.created_at || '').toLocaleString('tr-TR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                }),
+                comment: r.comment || ''
+            }));
+
+            // Sıralama işlemi
+            const sorted = [...formatted].sort((a, b) => {
+                if (selectedSort === 'Yeniden Eskiye') {
+                    return new Date(b.date).getTime() - new Date(a.date).getTime();
+                } else if (selectedSort === 'Puana Göre') {
+                    return b.rating - a.rating;
+                } else if (selectedSort === 'En İyi Değerlendirmeler') {
+                    if (b.rating !== a.rating) return b.rating - a.rating;
+                    return new Date(b.date).getTime() - new Date(a.date).getTime();
+                } else if (selectedSort === 'En Eski') {
+                    return new Date(a.date).getTime() - new Date(b.date).getTime();
+                }
+                return 0;
+            });
+
+            // Kendi yorumunu en üste alma
+            const prioritized = [...sorted].sort((a, b) => {
+                if (a.userId === currentUserId) return -1;
+                if (b.userId === currentUserId) return 1;
+                return 0;
+            });
+
+            setBusinessReviews(prioritized);
+        });
+    }, [businessId, selectedSort]);
+
+    const handleDelete = async (reviewId: string) => {
+        try {
+            const token = await AsyncStorage.getItem('accessToken');
+            if (!token) throw new Error('Yetki bilgisi yok');
+
+            await removeReview(token, reviewId);
+            Toast.show({ type: 'success', text1: 'Yorum silindi!' });
+
+            await fetchReviews(businessId);
+            const updatedReviews = useReviewStore.getState().reviews;
+            const formatted = updatedReviews.map((r) => ({
+                id: r.reviewsId,
+                userId: r.userId,
+                name: r.user?.full_name || 'Kullanıcı',
+                avatar: r.user?.image_url || null,
+                rating: r.rating,
+                date: new Date(r.created_at || '').toLocaleString('tr-TR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                }),
+                comment: r.comment || '',
+            }));
+            setBusinessReviews(formatted);
+        } catch (err: any) {
+            Toast.show({ type: 'error', text1: 'Silinemedi', text2: err.message });
+        }
+    };
+
+    const handleSubmit = async () => {
+        try {
+            const token = await AsyncStorage.getItem('accessToken');
+            if (!token) throw new Error('Yetki bilgisi bulunamadı.');
+            if (!businessId) throw new Error('İşletme bulunamadı.');
+
+            if (isEditing && editingId) {
+                await editReview(token, editingId, rating, comment);
+                Toast.show({ type: 'success', text1: 'Yorum güncellendi!' });
+            } else {
+                await addReview(token, businessId, rating, comment);
+                Toast.show({ type: 'success', text1: 'Yorum eklendi!' });
+            }
+
+            setRating(0);
+            setComment('');
+            setIsEditing(false);
+            setEditingId(null);
+
+            await fetchReviews(businessId);
+            const updatedReviews = useReviewStore.getState().reviews;
+            const formatted = updatedReviews.map((r) => ({
+                id: r.reviewsId,
+                userId: r.userId,
+                name: r.user?.full_name || 'Kullanıcı',
+                avatar: r.user?.image_url || null,
+                rating: r.rating,
+                date: new Date(r.created_at || '').toLocaleString('tr-TR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                }),
+                comment: r.comment || '',
+            }));
+            setBusinessReviews(formatted);
+
+        } catch (err: any) {
+            Toast.show({ type: 'error', text1: 'İşlem başarısız', text2: err.message });
+        }
+    };
 
     return (
-        <View style={[{ padding: 16 }, { backgroundColor: colors.background }, { flex: 1 }]}>
-            {/* Ortalama Puan */}
-            {/* İçerikler */}
+        <View style={[{ padding: 16 }, { backgroundColor: colors.background }, { flex: 1, position: 'relative' }]}>
+            {/* Ortalama Puan Kutusu */}
             <View style={styles.ratingBox}>
                 <View style={styles.ratingRow}>
                     <Text style={styles.ratingNumber}>
-                        4,5<Text style={styles.outOfFive}>/5</Text>
+                        {average.toFixed(1)}<Text style={styles.outOfFive}>/5</Text>
                     </Text>
-
                     <View style={styles.starsContainer}>
-                        {[1, 2, 3, 4].map((i) => (
-                            <Ionicons key={i} name="star" size={24} color="#000" />
+                        {[...Array(5)].map((_, i) => (
+                            <Ionicons
+                                key={i}
+                                name={i < Math.floor(average) ? 'star' : i < average ? 'star-half' : 'star-outline'}
+                                size={24}
+                                color="#000"
+                            />
                         ))}
-                        <Ionicons name="star-half" size={24} color="#000" />
                     </View>
                 </View>
-
-                <Text style={styles.totalReviews}>
-                    {totalReviews.toLocaleString()}+ Değerlendirme
-                </Text>
+                <Text style={styles.totalReviews}>{total.toLocaleString()}+ Değerlendirme</Text>
             </View>
 
+            {/* Yorum Ekleme Kutusu */}
+            <View style={styles.reviewCard}>
+                <View style={styles.reviewHeader}>
+                    <Image
+                        source={
+                            profile?.signed_url
+                                ? { uri: profile.signed_url }
+                                : profile?.image_url
+                                    ? { uri: profile.image_url }
+                                    : require('../../assets/images/salons/defaultimage.png')
+                        }
+                        style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 20,
+                            borderWidth: profile?.image_url ? 0 : 1,
+                            borderColor: '#ccc'
+                        }}
+                    />
+                    <View style={{ marginLeft: 10 }}>
+                        <Text style={styles.userName}>{profile?.full_name || 'Kullanıcı'}</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                            {[1, 2, 3, 4, 5].map((i) => (
+                                <TouchableOpacity key={i} onPress={() => setRating(i)}>
+                                    <Ionicons
+                                        name={i <= rating ? 'star' : 'star-outline'}
+                                        size={14}
+                                        color={i <= rating ? 'orange' : 'gray'}
+                                    />
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    </View>
+                </View>
+                <TextInput
+                    placeholder="Yorumunuzu buraya yazın..."
+                    multiline
+                    numberOfLines={3}
+                    value={comment}
+                    onChangeText={setComment}
+                    style={{
+                        borderColor: '#ccc',
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        padding: 10,
+                        marginBottom: 10,
+                        backgroundColor: '#fff'
+                    }}
+                />
+                <TouchableOpacity
+                    onPress={handleSubmit}
+                    style={{
+                        backgroundColor: '#000',
+                        padding: 10,
+                        borderRadius: 8,
+                        alignItems: 'center'
+                    }}
+                >
+                    <Text style={{ color: '#fff' }}>Gönder</Text>
+                </TouchableOpacity>
+            </View>
 
-            {/* Filtre Butonları */}
-            <Text style={styles.reviewTitle}>Değerlendirmeler</Text>
-            <View style={styles.filterButtons}>
-                {sortOptions.map(option => (
+            <View>
+                <Text style={styles.reviewTitle}>Değerlendirmeler</Text>
+                <View style={styles.extraButtons}>
+                    <TouchableOpacity style={[styles.button, { borderColor: colors.border }]}>
+                        <Feather name="sliders" size={16} color={colors.text} />
+                        <Text style={[styles.buttonText, { color: colors.text }]}>Filtrele</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[styles.button, { borderColor: colors.border }]}
+                        onPress={() => {
+                            // Açılır menü ya da modal ile sıralama seçimi yapılabilir
+                            // örnek: setShowSortModal(true)
+                        }}
+                    >
+                        <Feather name="list" size={16} color={colors.text} />
+                        <Text style={[styles.buttonText, { color: colors.text }]}>Sırala: Önerilenler</Text>
+                    </TouchableOpacity>
+                </View>
+
+            </View>
+            <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.filterButtons}
+            >
+                {sortOptions.map((option) => (
                     <TouchableOpacity
                         key={option}
-                        style={[styles.filterButton, selectedSort === option && styles.filterButtonActive]}
+                        style={[
+                            styles.filterButton,
+                            selectedSort === option && styles.filterButtonActive
+                        ]}
                         onPress={() => setSelectedSort(option)}
                     >
-                        <Text style={[styles.filterButtonText, selectedSort === option && styles.filterButtonTextActive]}>
+                        <Text
+                            style={[
+                                styles.filterButtonText,
+                                selectedSort === option && styles.filterButtonTextActive
+                            ]}
+                        >
                             {option}
                         </Text>
                     </TouchableOpacity>
                 ))}
-            </View>
+            </ScrollView>
 
-            {/* Yorum Listesi */}
+            {/* Yorumlar Listesi */}
             <FlatList
-                data={reviews}
-                keyExtractor={(item) => item.id}
+                data={businessReviews}
+                keyExtractor={(item, index) => item.id || index.toString()}
                 renderItem={({ item }) => (
                     <View style={styles.reviewCard}>
                         <View style={styles.reviewHeader}>
-                            <Ionicons name="person-circle-outline" size={40} color="black" />
+                            <Image
+                                source={
+                                    item.avatar ? { uri: item.avatar } : require('../../assets/images/salons/defaultimage.png')
+                                }
+                                style={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: 20,
+                                    borderWidth: item.avatar ? 0 : 1,
+                                    borderColor: '#ccc'
+                                }}
+                            />
                             <View style={{ marginLeft: 10 }}>
                                 <Text style={styles.userName}>{item.name}</Text>
                                 <View style={{ flexDirection: 'row' }}>
@@ -84,24 +348,116 @@ export default function ReviewTab() {
                             </View>
                         </View>
                         <Text style={styles.commentText}>{item.comment}</Text>
+                        {/* ✏️ Kullanıcıya özel düzenle/sil butonları */}
+                        {currentUserId === item.userId && (
+                            <View style={styles.actionButtonsWrapper}>
+                                <TouchableOpacity onPress={() => {
+                                    setComment(item.comment);
+                                    setRating(item.rating);
+                                    setIsEditing(true);
+                                    setEditingId(item.id);
+                                }} style={styles.actionButton}>
+                                    <Ionicons name="create-outline" size={16} color="#666" />
+                                </TouchableOpacity>
+
+                                <TouchableOpacity onPress={() => setSelectedToDelete(item.id)} style={styles.actionButton}>
+                                    <Ionicons name="trash-outline" size={16} color="#e74c3c" />
+                                </TouchableOpacity>
+                            </View>
+                        )}
+
                     </View>
                 )}
                 scrollEnabled={false}
                 contentContainerStyle={{ paddingTop: 10 }}
             />
+            {selectedToDelete && (
+
+                <Modal
+                    visible={!!selectedToDelete}
+                    transparent
+                    animationType="fade"
+                    onRequestClose={() => setSelectedToDelete(null)}
+                >
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalBox}>
+                            <Text style={styles.modalTitle}>Bu yorumu silmek istediğine emin misin?</Text>
+                            <View style={styles.modalActions}>
+                                <TouchableOpacity
+                                    style={styles.modalButtonYes}
+                                    onPress={() => {
+                                        handleDelete(selectedToDelete);
+                                        setSelectedToDelete(null);
+                                    }}
+                                >
+                                    <Text style={{ color: '#fff' }}>Evet</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.modalButtonNo}
+                                    onPress={() => setSelectedToDelete(null)}
+                                >
+                                    <Text style={{ color: '#000' }}>Hayır</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+            )}
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    ratingCard: {
-        backgroundColor: '#fff',
-        padding: 16,
-        borderRadius: 12,
-        borderColor: '#eee',
-        borderWidth: 1,
-        marginBottom: 16,
+    actionBar: {
+        flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 12,
+    },
+
+    filterButtons: {
+        flexDirection: 'row',
+        gap: 8,
+    },
+
+    extraButtons: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+
+    button: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderWidth: 1,
+        borderRadius: 20,
+        backgroundColor: 'transparent',
+    },
+
+    buttonText: {
+        marginLeft: 6,
+        fontSize: 13,
+    }
+    ,
+    actionButtonsWrapper: {
+        position: 'absolute',
+        top: 6,
+        right: 6,
+        flexDirection: 'row',
+        gap: 6,
+        backgroundColor: 'rgba(255,255,255,0.85)',
+        padding: 4,
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 1, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 3,
+    },
+    actionButton: {
+        padding: 2,
     },
     ratingBox: {
         backgroundColor: '#fff',
@@ -109,60 +465,89 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         borderRadius: 12,
         width: '100%',
-        alignSelf: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 6,
-        elevation: 4, // Android için gölge
+        elevation: 4
     },
     ratingRow: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         gap: 8,
-        marginBottom: 8,
+        marginBottom: 8
     },
     ratingNumber: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#000',
+        color: '#000'
     },
     outOfFive: {
         fontSize: 16,
         fontWeight: '400',
-        color: '#888',
+        color: '#888'
     },
     starsContainer: {
-        flexDirection: 'row',
+        flexDirection: 'row'
     },
     totalReviews: {
         fontSize: 12,
         marginTop: 6,
         color: '#666',
-        textAlign: 'center',
+        textAlign: 'center'
     },
-    barRow: {
+    reviewCard: {
+        backgroundColor: '#f9f9f9',
+        padding: 12,
+        borderRadius: 8,
+        marginBottom: 12
+    },
+    reviewHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: 4,
+        marginBottom: 8
     },
-    starLabel: {
-        width: 20,
+    userName: {
+        fontWeight: 'bold',
+        color: '#000'
+    },
+    reviewDate: {
+        fontSize: 11,
+        color: '#888',
+        marginTop: 2
+    },
+    commentText: {
+        fontSize: 13,
+        color: '#000'
+    },
+    sortButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        marginBottom: 12
+    },
+    sortButtonText: {
         fontSize: 12,
-        marginRight: 4,
-        color: '#000',
+        color: '#666'
     },
-    barBackground: {
-        flex: 1,
-        height: 8,
+    filterButton: {
+        paddingVertical: 6,
+        paddingHorizontal: 14,
+        borderRadius: 20,
+        marginTop: 6,
         backgroundColor: '#eee',
-        borderRadius: 4,
     },
-    barFill: {
-        height: 8,
+    filterButtonActive: {
         backgroundColor: '#000',
-        borderRadius: 4,
+    },
+    filterButtonText: {
+        color: '#555',
+        fontSize: 13,
+    },
+    filterButtonTextActive: {
+        color: '#fff',
+        fontWeight: 'bold',
     },
     reviewTitle: {
         fontSize: 16,
@@ -170,49 +555,49 @@ const styles = StyleSheet.create({
         marginBottom: 8,
         color: '#000',
     },
-    filterButtons: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginBottom: 16,
-    },
-    filterButton: {
-        backgroundColor: '#eee',
-        paddingVertical: 6,
-        paddingHorizontal: 10,
-        borderRadius: 6,
-    },
-    filterButtonActive: {
-        backgroundColor: '#000',
-    },
-    filterButtonText: {
-        fontSize: 12,
-        color: '#000',
-    },
-    filterButtonTextActive: {
-        color: '#fff',
-    },
-    reviewCard: {
-        backgroundColor: '#f9f9f9',
-        padding: 12,
-        borderRadius: 8,
-        marginBottom: 12,
-    },
-    reviewHeader: {
-        flexDirection: 'row',
+    modalOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 8,
+        zIndex: 999,
     },
-    userName: {
+    modalBox: {
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+        width: '80%',
+        alignItems: 'center',
+    },
+    modalTitle: {
+        fontSize: 16,
         fontWeight: 'bold',
-        color: '#000',
+        marginBottom: 20,
+        textAlign: 'center',
     },
-    reviewDate: {
-        fontSize: 11,
-        color: '#888',
-        marginTop: 2,
+    modalActions: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
     },
-    commentText: {
-        fontSize: 13,
-        color: '#000',
+    modalButtonYes: {
+        backgroundColor: '#e74c3c',
+        padding: 10,
+        borderRadius: 8,
+        flex: 1,
+        marginRight: 8,
+        alignItems: 'center',
+    },
+    modalButtonNo: {
+        backgroundColor: '#ccc',
+        padding: 10,
+        borderRadius: 8,
+        flex: 1,
+        marginLeft: 8,
+        alignItems: 'center',
     },
 });
