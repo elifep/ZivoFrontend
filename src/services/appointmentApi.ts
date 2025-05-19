@@ -9,7 +9,6 @@ export const getUserAppointments = async () => {
             Authorization: `Bearer ${token}`,
         },
     });
-    console.log('📡 Yanıt Kodu:', response.status);
     if (!response.ok) {
         throw new Error('Randevular getirilemedi');
     }

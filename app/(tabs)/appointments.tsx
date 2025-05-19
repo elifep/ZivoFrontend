@@ -28,7 +28,8 @@ export default function AppointmentsScreen() {
 
     const { services, fetchAllServices } = useServiceStore();
     const getServiceById = (id: string | null) =>
-        services.find(s => s.servicesid === id);
+        services.find(s => s.servicesid?.trim?.() === id?.trim?.());
+
 
     const { businesses, fetchBusinesses } = useBusinessStore();
     const getBusinessById = (id: string) => businesses.find(b => b.businessId === id);
@@ -43,17 +44,12 @@ export default function AppointmentsScreen() {
     );
     const [selectedToCancel, setSelectedToCancel] = useState<any>(null);
 
-
     useEffect(() => {
         const loadAllData = async () => {
             try {
+                await fetchAllServices();
                 await fetchAppointments();
-                const businessesData = await fetchBusinesses();
-
-                const firstBusinessId = businessesData?.[0]?.businessId;
-                if (firstBusinessId) {
-                    await fetchAllServices();
-                }
+                await fetchBusinesses();
             } catch (err) {
                 console.error('Veriler yüklenirken hata oluştu:', err);
             }
@@ -181,7 +177,7 @@ export default function AppointmentsScreen() {
                                         <View style={styles.infoRow}>
                                             <Feather name="scissors" size={14} color={colors.icon} />
                                             <Text style={[styles.infoText, { color: colors.icon }]}>
-                                                {service?.name || a.servicesid}
+                                                {service?.name ?? 'unknownService'}
                                             </Text>
                                         </View>
                                         <View style={styles.infoRow}>

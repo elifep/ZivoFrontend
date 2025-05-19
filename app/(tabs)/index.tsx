@@ -99,7 +99,7 @@ export default function IndexScreen() {
     });
 
     if (searchTerm === '') {
-      setFilteredSalons(businesses);
+      setFilteredSalons(salons);
     } else {
       setFilteredSalons(filtered);
     }
@@ -180,9 +180,7 @@ export default function IndexScreen() {
             setSelectedCity('');
             setSelectedTown('');
             setSelectedDate('');
-            fetchBusinesses().then((all) => {
-              setFilteredSalons(all);
-            });
+            setFilteredSalons(salons);
           }
         }}
       />
@@ -265,6 +263,51 @@ export default function IndexScreen() {
         <FilterRow onFilterPress={() => setFilterModalVisible(true)}
           selectedSort={selectedSort}
           onSortChange={handleSortChange} />
+
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Recommended Salons</Text>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingLeft: 16, paddingBottom: 12 }}>
+          {salons
+            .filter((salon) => ratings[salon.businessId] >= 2.0)
+            .sort((a, b) => ratings[b.businessId] - ratings[a.businessId]) // ⭐️ Puanına göre sırala
+            .slice(0, 5)
+            .map((item) => (
+              <View key={item.businessId} style={{ marginRight: 12, width: 260 }}>
+                <TouchableOpacity
+                  onPress={() =>
+                    router.push({
+                      pathname: '/SalonDetailScreen',
+                      params: { salon: JSON.stringify(item) },
+                    })
+                  }
+                >
+                  <View style={{ position: 'relative' }}>
+                    <SalonCard
+                      businessName={item.businessName}
+                      adressline1={item.adressline1}
+                      image_url={item.image_url}
+                      fullWidth={false}
+                      liked={isFavourited(item.businessId)}
+                      onToggleLike={() => toggleFavourite(item.businessId)}
+                      rating={ratings[item.businessId]}
+                    />
+                    <View style={{
+                      position: 'absolute',
+                      top: 50,
+                      right: 10,
+                      backgroundColor: 'black',
+                      paddingHorizontal: 8,
+                      paddingVertical: 3,
+                      borderRadius: 4,
+                      zIndex: 10
+                    }}>
+                      <Text style={{ color: 'white', fontSize: 12 }}>10% Off</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            ))}
+        </ScrollView>
 
 
         <Text style={[styles.sectionTitle, { color: colors.text }]}>

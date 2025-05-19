@@ -72,7 +72,7 @@ export default function SalonCard({
 
       <View style={styles.info}>
         <Text style={[styles.name, { color: colors.text }]}>{businessName}</Text>
-        <Text style={[styles.address, { color: colors.icon }]} numberOfLines={2}>
+        <Text style={[styles.address, { color: colors.icon }]} numberOfLines={1}>
           {adressline1}
         </Text>
       </View>

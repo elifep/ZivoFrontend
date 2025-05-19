@@ -33,8 +33,7 @@ export const useServiceStore = create<ServiceStore>((set) => ({
             const response = await fetch(`${API_URL}/services`);
             if (!response.ok) throw new Error('Tüm hizmetler getirilemedi');
             const data = await response.json();
-            set({ allServices: data, loading: false }); // 👈 Buraya dikkat
-            // set({ services: data, loading: false });
+            set({ services: data, allServices: data, loading: false }); 
         } catch (error: any) {
             set({ error: error.message || 'An error occurred', loading: false });
         }

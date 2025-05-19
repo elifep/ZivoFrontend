@@ -56,7 +56,6 @@ export default function ProfilimScreen() {
 
     const handleLogout = async () => {
         await logout();
-        Alert.alert('Çıkış Yapıldı');
         router.replace('/auth/login');
     };
 
@@ -228,7 +227,7 @@ export default function ProfilimScreen() {
                             marginBottom: 20
                         }}>
                             <Text style={{ color: colors.text, fontWeight: '600', marginBottom: 8 }}>
-                                🌙 {t('Tema Seçimi')}
+                                🌙 {t('profile.theme')}
                             </Text>
                             <ThemePicker />
                         </View>
@@ -240,7 +239,7 @@ export default function ProfilimScreen() {
                             marginBottom: 20
                         }}>
                             <Text style={{ color: colors.text, fontWeight: '600', marginBottom: 8 }}>
-                                🌍 {t('Dil Seçimi')}
+                                🌍 {t('profile.language')}
                             </Text>
                             <LanguagePicker />
                         </View>
@@ -260,7 +259,7 @@ export default function ProfilimScreen() {
                         }}
                     >
                         <Ionicons name="log-out-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
-                        <Text style={{ color: '#fff', fontWeight: '600' }}>{t('Çıkış Yap')}</Text>
+                        <Text style={{ color: '#fff', fontWeight: '600' }}>{t('profile.logout')}</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
