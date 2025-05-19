@@ -8,14 +8,31 @@ import { getAllBusinesses } from '@/services/businessService';
 import { useRouter } from 'expo-router';
 import { useFavouriteStore } from '@/stores/favouriteStore';
 import * as Animatable from 'react-native-animatable';
+import { useReviewStore } from '@/stores/reviewStore';
 
 export default function FavoritesScreen() {
     const [favoriteSalons, setFavoriteSalons] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { fetchAverageByBusinessId } = useReviewStore();
     const { colors } = useAppTheme();
     const { t } = useTranslation();
     const router = useRouter();
     const { favourites, fetchFavourites, toggleFavourite } = useFavouriteStore();
+    const [ratings, setRatings] = useState<{ [key: string]: number }>({});
+    useEffect(() => {
+        const loadRatings = async () => {
+            const newRatings: Record<string, number> = {};
+            for (const item of favoriteSalons) {
+                const { average } = await fetchAverageByBusinessId(item.businessId);
+                newRatings[item.businessId] = average;
+            }
+            setRatings(newRatings);
+        };
+
+        if (favoriteSalons.length > 0) {
+            loadRatings();
+        }
+    }, [favoriteSalons]);
 
     useEffect(() => {
         setIsLoading(true);
@@ -25,12 +42,11 @@ export default function FavoritesScreen() {
                 const matched = data.filter((item: any) =>
                     favourites.some((fav) => fav.businessid === item.businessid)
                 );
-
                 const formatted = matched.map((item: any) => ({
                     businessId: item.businessid,
                     businessName: item.businessname,
                     adressline1: item.adressline1,
-                    image_url: item.signed_url || item.image_url || 'https://cdn-icons-png.flaticon.com/512/2920/2920068.png',
+                    image_url: item.signed_url || item.image_url,
                 }));
 
                 setFavoriteSalons(formatted);
@@ -79,6 +95,7 @@ export default function FavoritesScreen() {
                                         fullWidth
                                         liked={true}
                                         onToggleLike={() => handleToggle(item.businessId)}
+                                        rating={ratings[item.businessId]} // ⭐️ burada veriyoruz
                                     />
                                 </TouchableOpacity>
                             </Animatable.View>

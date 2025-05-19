@@ -10,12 +10,17 @@ interface Business {
     adressline1: string;
     image_url: string;
     signed_url?: string;
+    latitude: number;
+    longitude: number;
 }
-
 interface BusinessState {
     businesses: Business[];
     selectedBusiness?: Business;
-    fetchBusinesses: () => Promise<Business[]>; // ✅ Artık return tipi doğru
+    fetchBusinesses: () => Promise<Business[]>;
+    fetchNearbyBusinesses: (lat: number, lng: number, radius?: number) => Promise<Business[]>;
+    fetchTopRatedBusinesses: () => Promise<Business[]>;
+    fetchMostBookedBusinesses: () => Promise<Business[]>;
+    fetchFilteredBusinesses: (params: Record<string, any>) => Promise<Business[]>;
     setSelectedBusiness: (business: Business) => void;
 }
 
@@ -23,21 +28,53 @@ export const useBusinessStore = create<BusinessState>((set) => ({
     businesses: [],
     selectedBusiness: undefined,
 
-    fetchBusinesses: async (): Promise<Business[]> => {
+    fetchBusinesses: async () => {
         const rawData = await businessService.getAllBusinesses();
-
-        const formatted: Business[] = rawData.map((item: any) => ({
-            businessId: item.businessid,
-            businessName: item.businessname,
-            city: item.city,
-            town: item.town,
-            adressline1: item.adressline1,
-            image_url: item.signed_url || item.image_url || 'https://cdn-icons-png.flaticon.com/512/2920/2920068.png',
-        }));
-
-        set({ businesses: formatted }); // ✅ Artık "never" hatası almazsın
+        const formatted = formatBusinessList(rawData);
+        set({ businesses: formatted });
         return formatted;
     },
-    setSelectedBusiness: (business) => set({ selectedBusiness: business }),
 
+    fetchNearbyBusinesses: async (lat, lng, radius = 5) => {
+        const rawData = await businessService.getNearbyBusinesses(lat, lng, radius);
+        const formatted = formatBusinessList(rawData);
+        set({ businesses: formatted });
+        return formatted;
+    },
+
+    fetchTopRatedBusinesses: async () => {
+        const rawData = await businessService.getTopRatedBusinesses();
+        const formatted = formatBusinessList(rawData);
+        set({ businesses: formatted });
+        return formatted;
+    },
+
+    fetchMostBookedBusinesses: async () => {
+        const rawData = await businessService.getMostBookedBusinesses();
+        const formatted = formatBusinessList(rawData);
+        set({ businesses: formatted });
+        return formatted;
+    },
+
+    fetchFilteredBusinesses: async (params) => {
+        const rawData = await businessService.getFilteredBusinesses(params);
+        const formatted = formatBusinessList(rawData);
+        set({ businesses: formatted });
+        return formatted;
+    },
+
+    setSelectedBusiness: (business) => set({ selectedBusiness: business }),
 }));
+
+const formatBusinessList = (data: any[]): Business[] => {
+    return data.map((item: any) => ({
+        businessId: item.businessid,
+        businessName: item.businessname,
+        city: item.city,
+        town: item.town,
+        adressline1: item.adressline1,
+        image_url: item.signed_url || item.image_url,
+        latitude: item.latitude,
+        longitude: item.longitude
+    }));
+};

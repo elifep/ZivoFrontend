@@ -1,78 +1,271 @@
 import { useEffect, useState } from 'react';
-import { View, ScrollView, Text, StyleSheet, TouchableOpacity, SafeAreaView, ActivityIndicator } from 'react-native';
+import { View, ScrollView, Text, StyleSheet, TouchableOpacity, SafeAreaView, ActivityIndicator, Modal, TextInput } from 'react-native';
 import ExploreHeader from '@/components/ExploreHeader';
 import FilterRow from '@/components/FilterRow';
 import SalonCard from '@/components/SalonCard';
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { getAllBusinesses } from '@/services/businessService';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { useServiceStore } from '@/stores/serviceStore';
 import { useFavouriteStore } from '@/stores/favouriteStore';
 import * as Animatable from 'react-native-animatable';
 import { Ionicons } from '@expo/vector-icons'; // veya Feather, FontAwesome gibi
-
+import { useReviewStore } from '@/stores/reviewStore';
+import { useLocationPermission } from '@/hooks/useLocationPermission';
+import { useBusinessStore } from '@/stores/businessStore';
+import { haversineDistance } from '@/utils/geo';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import type { Service } from '@/stores/serviceStore';
 export default function IndexScreen() {
   const [salons, setSalons] = useState<any[]>([]);
   const [filteredSalons, setFilteredSalons] = useState<any[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [ratings, setRatings] = useState<{ [key: string]: number }>({});
+  const { fetchAverageByBusinessId } = useReviewStore();
   const [isLoading, setIsLoading] = useState(true);
   const { colors } = useAppTheme();
   const { t } = useTranslation();
-  const [selectedCategory, setSelectedCategory] = useState(t('explore.categories.all'));
   const router = useRouter();
-  const { fetchServices, services } = useServiceStore();
-  const { fetchFavourites, toggleFavourite, isFavourited } = useFavouriteStore();
-  const [isReady, setIsReady] = useState(false);
+  const { fetchServices, allServices, fetchAllServices } = useServiceStore();
+  const { toggleFavourite, isFavourited } = useFavouriteStore();
+  const { location, granted } = useLocationPermission();
+  const { fetchNearbyBusinesses, fetchBusinesses, fetchTopRatedBusinesses, fetchMostBookedBusinesses, fetchFilteredBusinesses, businesses } = useBusinessStore();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTab, setSelectedTab] = useState('all'); // Sekme seçimi (örnek: all, hair vs.)
+  const [filterModalVisible, setFilterModalVisible] = useState(false); // Modal aç/kapa
+  const [showDatePicker, setShowDatePicker] = useState(false); // Tarih seçici
+  const [selectedCity, setSelectedCity] = useState('');
+  const [selectedTown, setSelectedTown] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedSort, setSelectedSort] = useState<'recommended' | 'nearby' | 'topRated' | 'mostBooked'>('recommended');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   useEffect(() => {
-    setIsReady(true);
-    setIsLoading(true);
-    fetchFavourites();
-
-    getAllBusinesses()
-      .then((data) => {
-        const formatted = data.map((item: any) => ({
-          businessId: item.businessid,
-          businessName: item.businessname,
-          adressline1: item.adressline1,
-          image_url: item.signed_url || item.image_url,
-        }));
-        setSalons(formatted);
-        setFilteredSalons(formatted);
-        data.forEach((item: any) => {
-          fetchServices(item.businessid);
-        });
-      })
-      .finally(() => setTimeout(() => setIsLoading(false), 400)); // hızlı ama akıcı
+    fetchAllServices();
   }, []);
+  useEffect(() => {
+    const loadRatings = async () => {
+      const newRatings: Record<string, number> = {};
+      for (const salon of businesses) {
+        const { average } = await fetchAverageByBusinessId(salon.businessId);
+        newRatings[salon.businessId] = average;
+      }
+      setRatings(newRatings);
+    };
+
+    if (businesses.length > 0) {
+      loadRatings();
+    }
+  }, [businesses]);
 
   useEffect(() => {
+    if (location && granted) {
+      setIsLoading(true);
+
+      const fetchData = async () => {
+        const all = await fetchBusinesses(); // tüm salonları getir
+        const withDistance = all.map((salon) => {
+          const dist = haversineDistance(
+            { lat: location.latitude, lng: location.longitude },
+            { lat: salon.latitude, lng: salon.longitude }
+          );
+          return { ...salon, distance: dist };
+        });
+
+        const sorted = withDistance.sort((a, b) => a.distance - b.distance);
+
+        setSalons(sorted);
+        setFilteredSalons(sorted);
+
+        sorted.forEach((item: any) => {
+          fetchServices(item.businessId);
+        });
+
+        setTimeout(() => setIsLoading(false), 300);
+      };
+
+      fetchData();
+    }
+  }, [location, granted]);
+
+  useEffect(() => {
+    const lowerSearch = searchTerm.toLowerCase();
+
+    const filtered = businesses.filter((salon) => {
+      const matchSalonName = salon.businessName.toLowerCase().includes(lowerSearch);
+      const matchService = allServices.some((service: Service) =>
+        String(service.businessid) === String(salon.businessId) &&
+        service.name.toLowerCase().includes(lowerSearch)
+      );
+      return matchSalonName || matchService;
+    });
+
     if (searchTerm === '') {
-      setFilteredSalons(salons);
+      setFilteredSalons(businesses);
     } else {
-      const lowerSearch = searchTerm.toLowerCase();
-      const filtered = salons.filter((salon) => {
-        const matchSalonName = salon.businessName.toLowerCase().includes(lowerSearch);
-        const matchService = services.some((service) =>
+      setFilteredSalons(filtered);
+    }
+  }, [searchTerm, businesses, allServices]);
+
+  useEffect(() => {
+    const categoryMap: Record<string, string> = {
+      [t('explore.categories.hair')]: 'Hair',
+      [t('explore.categories.nail')]: 'Nail',
+      [t('explore.categories.skin')]: 'Skin',
+    };
+
+    const selectedKey = categoryMap[selectedCategory];
+    const sourceList = businesses;
+
+    let filtered = sourceList;
+
+    if (selectedKey) {
+      filtered = sourceList.filter((salon) =>
+        allServices.some((s: Service) =>
+          s.businessid === salon.businessId &&
+          s.name.toLowerCase().includes(selectedKey.toLowerCase())
+        )
+      );
+    }
+
+    // Arama terimi de varsa hem kategori hem arama eşleşsin
+    const lowerSearch = searchTerm.toLowerCase();
+    if (searchTerm !== '') {
+      filtered = filtered.filter((salon) => {
+        const matchName = salon.businessName.toLowerCase().includes(lowerSearch);
+        const matchService = allServices.some((service) =>
           service.businessid === salon.businessId &&
           service.name.toLowerCase().includes(lowerSearch)
         );
-        return matchSalonName || matchService;
+        return matchName || matchService;
       });
-      setFilteredSalons(filtered);
     }
-  }, [searchTerm, salons, services]);
+
+    setFilteredSalons(filtered);
+  }, [selectedCategory, searchTerm, businesses, allServices]);
+
+  const handleSortChange = async (sort: typeof selectedSort) => {
+    setSelectedSort(sort);
+
+    if (sort === 'topRated') {
+      const result = await fetchTopRatedBusinesses();
+      setFilteredSalons(result);
+    } else if (sort === 'mostBooked') {
+      const result = await fetchMostBookedBusinesses();
+      setFilteredSalons(result);
+    } else if (sort === 'nearby' && location) {
+      const result = await fetchNearbyBusinesses(location.latitude, location.longitude);
+      setFilteredSalons(result);
+    } else {
+      const result = await fetchBusinesses();
+      setFilteredSalons(result);
+    }
+  };
+  const normalizedCity = selectedCity.trim().toLowerCase();
+  const normalizedTown = selectedTown.trim().toLowerCase();
+  const normalizedQuery = searchTerm.trim().toLowerCase();
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#000', paddingTop:12}}>
-      <ScrollView style={{ backgroundColor: colors.background }}>
-        <ExploreHeader
-          selected={selectedCategory}
-          onSelect={setSelectedCategory}
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#000', paddingTop: 12 }}>
+
+      <ExploreHeader
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onLocationPress={() => setFilterModalVisible(true)}
+        onDatePress={() => setShowDatePicker(true)}
+        selectedTab={selectedTab}
+        onSelectTab={(key) => {
+          setSelectedTab(key);
+          // "Tümü" sekmesine tıklandığında tüm salonları yeniden göster
+          if (key === 'all') {
+            setSearchTerm('');
+            setSelectedCity('');
+            setSelectedTown('');
+            setSelectedDate('');
+            fetchBusinesses().then((all) => {
+              setFilteredSalons(all);
+            });
+          }
+        }}
+      />
+      {/* Şehir / İlçe / Tarih Modal */}
+      <Modal visible={filterModalVisible} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text>City</Text>
+            <TextInput
+              placeholder="İstanbul"
+              value={selectedCity}
+              onChangeText={setSelectedCity}
+              style={styles.input}
+            />
+
+            <Text>District</Text>
+            <TextInput
+              placeholder="Kadıköy"
+              value={selectedTown}
+              onChangeText={setSelectedTown}
+              style={styles.input}
+            />
+
+            <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateButton}>
+              <Text>Select Date:{selectedDate || 'Not selected'}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={async () => {
+                const result = await fetchFilteredBusinesses({
+                  city: normalizedCity,
+                  town: normalizedTown,
+                  date: selectedDate,
+                  query: normalizedQuery,
+                });
+                setFilteredSalons(result);
+                setFilterModalVisible(false);
+              }}
+              style={styles.applyButton}
+            >
+              <Text style={{ color: '#fff', textAlign: 'center' }}>Apply Filter</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => setFilterModalVisible(false)}>
+              <Text style={{ marginTop: 10, textAlign: 'center', color: 'gray' }}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {showDatePicker && (
+        <DateTimePicker
+          mode="date"
+          display="default"
+          value={selectedDate ? new Date(selectedDate) : new Date()}
+          onChange={(e, date) => {
+            if (e.type === 'set' && date) {
+              setSelectedDate(date.toISOString().split('T')[0]);
+            }
+            setShowDatePicker(false);
+          }}
         />
-        <FilterRow />
+      )}
+
+      {showDatePicker && (
+        <DateTimePicker
+          mode="date"
+          display="default"
+          value={selectedDate ? new Date(selectedDate) : new Date()}
+          onChange={(e, date) => {
+            if (e.type === 'set' && date) {
+              setSelectedDate(date.toISOString().split('T')[0]);
+            }
+            setShowDatePicker(false); // her durumda kapat
+          }}
+        />
+      )}
+
+      <ScrollView style={{ backgroundColor: colors.background }}>
+        <FilterRow onFilterPress={() => setFilterModalVisible(true)}
+          selectedSort={selectedSort}
+          onSortChange={handleSortChange} />
+
 
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
           {t('explore.title')}
@@ -106,6 +299,7 @@ export default function IndexScreen() {
                   fullWidth
                   liked={isFavourited(item.businessId)}
                   onToggleLike={() => toggleFavourite(item.businessId)}
+                  rating={ratings[item.businessId]} // ⭐️ burada veriyoruz
                 />
               </TouchableOpacity>
             </Animatable.View>
@@ -116,21 +310,15 @@ export default function IndexScreen() {
           </Text>
         )}
       </ScrollView>
-      {isReady && (
-        <TouchableOpacity
-          onPress={() => {
-            try {
-              router.push('/MapScreen');
-            } catch (err) {
-              console.log('Map yönlendirme hatası:', err);
-            }
-          }}
-          style={styles.floatingMapButton}
-        >
-          <Ionicons name="map-outline" size={20} color="white" />
-          <Text style={styles.mapButtonText}>Map</Text>
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity
+        onPress={() => {
+          router.push('/MapScreen');
+        }}
+        style={styles.floatingMapButton}
+      >
+        <Ionicons name="map-outline" size={20} color="white" />
+        <Text style={styles.mapButtonText}>Map</Text>
+      </TouchableOpacity>
 
     </SafeAreaView>
   );
@@ -172,4 +360,34 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000000aa',
+  },
+  modalBox: {
+    width: '90%',
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 12,
+  },
+  input: {
+    borderBottomWidth: 1,
+    marginVertical: 8,
+    paddingVertical: 4,
+  },
+  dateButton: {
+    backgroundColor: '#eee',
+    padding: 10,
+    marginTop: 10,
+    borderRadius: 6,
+  },
+  applyButton: {
+    marginTop: 16,
+    backgroundColor: 'black',
+    padding: 12,
+    borderRadius: 6,
+  },
+
 });

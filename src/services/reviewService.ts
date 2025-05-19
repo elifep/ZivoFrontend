@@ -71,3 +71,13 @@ export const deleteReview = async (token: string, reviewId: string) => {
         throw new Error(err.message || 'Failed to delete review');
     }
 };
+export const getAverageByBusinessId = async (businessId: string) => {
+    const response = await fetch(`${API_URL}/reviews/business/${businessId}/average`);
+    if (!response.ok) throw new Error('Ortalama veri alınamadı');
+    const data = await response.json();
+
+    return {
+        average: data.averageRating || 0, // ⚠️ average değil averageRating
+        total: data.totalReviews || 0,
+    };
+};

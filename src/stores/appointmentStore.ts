@@ -35,7 +35,7 @@ export const useAppointmentStore = create<AppointmentStore>((set, get) => ({
             }));
             set({ appointments: mapped });
         } catch (error: any) {
-            set({ error: error.message || 'Bir hata oluştu' });
+            set({ error: error.message || 'An error occurred' });
         } finally {
             set({ loading: false });
         }

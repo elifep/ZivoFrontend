@@ -10,6 +10,9 @@ import { API_URL } from '@/config/config';
 import { useServiceStore } from '@/stores/serviceStore';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useReviewStore } from '@/stores/reviewStore';
+import { useFavouriteStore } from '@/stores/favouriteStore';
+import { FontAwesome } from '@expo/vector-icons';
 
 export default function SalonDetailScreen() {
     const { colors, isDark } = useAppTheme();
@@ -17,8 +20,10 @@ export default function SalonDetailScreen() {
     const router = useRouter();
     const { salon } = useLocalSearchParams();
     const salonData = JSON.parse(salon as string);
-    const [isLiked, setIsLiked] = useState(salonData.liked);
     const { services, fetchServices, loading } = useServiceStore();
+    const { fetchAverageByBusinessId } = useReviewStore();
+    const [rating, setRating] = useState<number>(0);
+    const { isFavourited, toggleFavourite } = useFavouriteStore();
 
     const [selectedTab, setSelectedTab] = useState(t('salonDetail.tabs.services'));
     const [searchTerm, setSearchTerm] = useState('');
@@ -31,6 +36,14 @@ export default function SalonDetailScreen() {
             fetchServices(salonData.businessId);
         }
     }, [salonData?.businessId]);
+
+    useEffect(() => {
+        if (salonData.businessId) {
+            fetchAverageByBusinessId(salonData.businessId).then(({ average }) => {
+                setRating(average);
+            });
+        }
+    }, [salonData.businessId]);
     return (
         <View style={{ flex: 1, backgroundColor: colors.background }}>
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
@@ -54,8 +67,8 @@ export default function SalonDetailScreen() {
 
                     {/* Puan Kutusu */}
                     <View style={styles.starBox}>
-                        <Ionicons name="star" size={16} color="#F7C429" />
-                        <Text style={styles.starBoxText}>5.0</Text>
+                        <Ionicons name="star" size={16} color="#000" />
+                        <Text style={styles.starBoxText}>{rating.toFixed(1)}</Text>
                     </View>
 
                     {/* Siyah Bilgi Alanı (Resmin Üstünde) */}
@@ -68,9 +81,14 @@ export default function SalonDetailScreen() {
                                         <Text style={styles.discountText}>{salonData.discount}</Text>
                                     </View>
                                 )}
-                                <TouchableOpacity onPress={() => setIsLiked(!isLiked)}>
-                                    <Feather name={isLiked ? 'heart' : 'heart'} size={20} color="white" />
+                                <TouchableOpacity onPress={() => toggleFavourite(salonData.businessId)}>
+                                    <FontAwesome
+                                        name={isFavourited(salonData.businessId) ? 'heart' : 'heart-o'}
+                                        size={20}
+                                        color="white"
+                                    />
                                 </TouchableOpacity>
+
                             </View>
                         </View>
                         <Text style={styles.salonAddress}>{salonData.adressline1}</Text>

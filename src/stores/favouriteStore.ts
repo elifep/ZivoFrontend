@@ -42,7 +42,7 @@ export const useFavouriteStore = create<FavouriteStore>((set, get) => ({
                 });
                 Toast.show({
                     type: 'success',
-                    text1: 'Favorilerden çıkarıldı',
+                    text1: 'Removed from favorites',
                     position: 'top',
                 });
             } else {
@@ -50,7 +50,7 @@ export const useFavouriteStore = create<FavouriteStore>((set, get) => ({
                 set({ favourites: [...favourites, newFav] });
                 Toast.show({
                     type: 'success',
-                    text1: 'Favorilere eklendi',
+                    text1: 'Added to favorites',
                     position: 'top',
                 });
             }
@@ -58,8 +58,8 @@ export const useFavouriteStore = create<FavouriteStore>((set, get) => ({
             console.error('Favori güncellenemedi:', err);
             Toast.show({
                 type: 'error',
-                text1: 'Bir hata oluştu',
-                text2: 'Favori güncellenemedi',
+                text1: 'An error occurred',
+                text2: 'Failed to update favorite',
                 position: 'top',
             });
         }

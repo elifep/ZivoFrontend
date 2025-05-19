@@ -4,7 +4,8 @@ import {
     getAverageRatingByBusiness,
     createReview,
     updateReview,
-    deleteReview
+    deleteReview,
+    getAverageByBusinessId
 } from '@/services/reviewService';
 
 interface Review {
@@ -29,6 +30,7 @@ interface ReviewStore {
     addReview: (token: string, businessId: string, rating: number, comment: string) => Promise<void>;
     editReview: (token: string, reviewId: string, rating: number, comment: string) => Promise<void>;
     removeReview: (token: string, reviewId: string) => Promise<void>;
+    fetchAverageByBusinessId: (businessId: string) => Promise<{ average: number, total: number }>;
 }
 
 export const useReviewStore = create<ReviewStore>((set, get) => ({
@@ -75,5 +77,17 @@ export const useReviewStore = create<ReviewStore>((set, get) => ({
             reviews: state.reviews.filter((r) => r.reviewsId !== reviewId),
             total: state.total - 1
         }));
-    }
+    },
+    fetchAverageByBusinessId: async (businessId: string) => {
+        try {
+            const data = await getAverageByBusinessId(businessId); // bu zaten { average, total } dönüyor
+            return data;
+        } catch (error) {
+            console.error('⭐ Ortalama puan hatası:', error);
+            return {
+                average: 0,
+                total: 0
+            };
+        }
+    },
 }));

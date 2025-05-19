@@ -9,6 +9,7 @@ interface Props {
   liked?: boolean;
   fullWidth?: boolean;
   onToggleLike?: () => void;
+  rating?: number;
 }
 
 export default function SalonCard({
@@ -18,12 +19,12 @@ export default function SalonCard({
   liked,
   fullWidth,
   onToggleLike,
+  rating
 }: Props) {
   const { colors } = useAppTheme();
   const screenWidth = Dimensions.get('window').width;
 
   const isLiked = liked ?? false;
-  const defaultImage = require('../../assets/images/salons/defaultimage.png');
 
   const handleToggleLike = () => {
     if (onToggleLike) {
@@ -43,9 +44,9 @@ export default function SalonCard({
 
         <Image
           source={
-            image_url
+            image_url && image_url.startsWith('http')
               ? { uri: image_url }
-              : defaultImage
+              : require('../../assets/images/salons/defaultimage.png')
           }
           style={styles.image}
         />
@@ -62,8 +63,10 @@ export default function SalonCard({
         </TouchableOpacity>
 
         <View style={[styles.ratingTopRight, { backgroundColor: colors.background, borderColor: colors.border }]}>
-          <Feather name="star" size={14} color={colors.text} />
-          <Text style={[styles.ratingText, { color: colors.text }]}>5.0</Text>
+          <Feather name="star" size={15} color={colors.text} />
+          <Text style={[styles.ratingText, { color: colors.text }]}>
+            {rating?.toFixed(1) ?? '0.0'}
+          </Text>
         </View>
       </View>
 

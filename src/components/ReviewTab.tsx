@@ -21,7 +21,7 @@ export const getUserIdFromToken = async (): Promise<string | null> => {
         return null;
     }
 };
-const sortOptions = ['En İyi Değerlendirmeler', 'Yeniden Eskiye', 'Puana Göre', 'En Eski'];
+const sortOptions = ['Recommended', 'Newest First', 'By Rating', 'Oldest First'];
 
 interface DisplayReview {
     id: string;
@@ -47,7 +47,7 @@ export default function ReviewTab({ salonData }: ReviewTabProps) {
     const [editingId, setEditingId] = useState<string | null>(null);
     const businessId = salonData.businessId;
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-    const [selectedSort, setSelectedSort] = useState('Yeniden Eskiye');
+    const [selectedSort, setSelectedSort] = useState('	Newest First');
     const { average, total, fetchReviews, addReview } = useReviewStore();
     const { profile, fetchProfile } = useProfileStore();
     const [comment, setComment] = useState('');
@@ -84,14 +84,14 @@ export default function ReviewTab({ salonData }: ReviewTabProps) {
 
             // Sıralama işlemi
             const sorted = [...formatted].sort((a, b) => {
-                if (selectedSort === 'Yeniden Eskiye') {
+                if (selectedSort === 'Newest First') {
                     return new Date(b.date).getTime() - new Date(a.date).getTime();
-                } else if (selectedSort === 'Puana Göre') {
+                } else if (selectedSort === 'By Rating') {
                     return b.rating - a.rating;
-                } else if (selectedSort === 'En İyi Değerlendirmeler') {
+                } else if (selectedSort === 'Recommended') {
                     if (b.rating !== a.rating) return b.rating - a.rating;
                     return new Date(b.date).getTime() - new Date(a.date).getTime();
-                } else if (selectedSort === 'En Eski') {
+                } else if (selectedSort === 'Oldest First') {
                     return new Date(a.date).getTime() - new Date(b.date).getTime();
                 }
                 return 0;
@@ -111,10 +111,10 @@ export default function ReviewTab({ salonData }: ReviewTabProps) {
     const handleDelete = async (reviewId: string) => {
         try {
             const token = await AsyncStorage.getItem('accessToken');
-            if (!token) throw new Error('Yetki bilgisi yok');
+            if (!token) throw new Error('No authorization token found');
 
             await removeReview(token, reviewId);
-            Toast.show({ type: 'success', text1: 'Yorum silindi!' });
+            Toast.show({ type: 'success', text1: 'Review deleted!' });
 
             await fetchReviews(businessId);
             const updatedReviews = useReviewStore.getState().reviews;
@@ -135,22 +135,22 @@ export default function ReviewTab({ salonData }: ReviewTabProps) {
             }));
             setBusinessReviews(formatted);
         } catch (err: any) {
-            Toast.show({ type: 'error', text1: 'Silinemedi', text2: err.message });
+            Toast.show({ type: 'error', text1: 'Could not delete', text2: err.message });
         }
     };
 
     const handleSubmit = async () => {
         try {
             const token = await AsyncStorage.getItem('accessToken');
-            if (!token) throw new Error('Yetki bilgisi bulunamadı.');
-            if (!businessId) throw new Error('İşletme bulunamadı.');
+            if (!token) throw new Error('No authorization token found');
+            if (!businessId) throw new Error('No business found.');
 
             if (isEditing && editingId) {
                 await editReview(token, editingId, rating, comment);
-                Toast.show({ type: 'success', text1: 'Yorum güncellendi!' });
+                Toast.show({ type: 'success', text1: '	Review updated!' });
             } else {
                 await addReview(token, businessId, rating, comment);
-                Toast.show({ type: 'success', text1: 'Yorum eklendi!' });
+                Toast.show({ type: 'success', text1: '	Review submitted!' });
             }
 
             setRating(0);
@@ -178,7 +178,7 @@ export default function ReviewTab({ salonData }: ReviewTabProps) {
             setBusinessReviews(formatted);
 
         } catch (err: any) {
-            Toast.show({ type: 'error', text1: 'İşlem başarısız', text2: err.message });
+            Toast.show({ type: 'error', text1: 'Operation failed', text2: err.message });
         }
     };
 
@@ -201,7 +201,7 @@ export default function ReviewTab({ salonData }: ReviewTabProps) {
                         ))}
                     </View>
                 </View>
-                <Text style={styles.totalReviews}>{total.toLocaleString()}+ Değerlendirme</Text>
+                <Text style={styles.totalReviews}>{total.toLocaleString()}+ Reviews</Text>
             </View>
 
             {/* Yorum Ekleme Kutusu */}
@@ -239,7 +239,7 @@ export default function ReviewTab({ salonData }: ReviewTabProps) {
                     </View>
                 </View>
                 <TextInput
-                    placeholder="Yorumunuzu buraya yazın..."
+                    placeholder="Write your review here..."
                     multiline
                     numberOfLines={3}
                     value={comment}
@@ -262,16 +262,16 @@ export default function ReviewTab({ salonData }: ReviewTabProps) {
                         alignItems: 'center'
                     }}
                 >
-                    <Text style={{ color: '#fff' }}>Gönder</Text>
+                    <Text style={{ color: '#fff' }}>Submit</Text>
                 </TouchableOpacity>
             </View>
 
             <View>
-                <Text style={styles.reviewTitle}>Değerlendirmeler</Text>
+                <Text style={styles.reviewTitle}>Reviews</Text>
                 <View style={styles.extraButtons}>
                     <TouchableOpacity style={[styles.button, { borderColor: colors.border }]}>
                         <Feather name="sliders" size={16} color={colors.text} />
-                        <Text style={[styles.buttonText, { color: colors.text }]}>Filtrele</Text>
+                        <Text style={[styles.buttonText, { color: colors.text }]}>Filter</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -282,7 +282,7 @@ export default function ReviewTab({ salonData }: ReviewTabProps) {
                         }}
                     >
                         <Feather name="list" size={16} color={colors.text} />
-                        <Text style={[styles.buttonText, { color: colors.text }]}>Sırala: Önerilenler</Text>
+                        <Text style={[styles.buttonText, { color: colors.text }]}>Sort by: Recommended</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -381,7 +381,7 @@ export default function ReviewTab({ salonData }: ReviewTabProps) {
                 >
                     <View style={styles.modalOverlay}>
                         <View style={styles.modalBox}>
-                            <Text style={styles.modalTitle}>Bu yorumu silmek istediğine emin misin?</Text>
+                            <Text style={styles.modalTitle}>Are you sure you want to delete this review?</Text>
                             <View style={styles.modalActions}>
                                 <TouchableOpacity
                                     style={styles.modalButtonYes}
@@ -390,13 +390,13 @@ export default function ReviewTab({ salonData }: ReviewTabProps) {
                                         setSelectedToDelete(null);
                                     }}
                                 >
-                                    <Text style={{ color: '#fff' }}>Evet</Text>
+                                    <Text style={{ color: '#fff' }}>Yes</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.modalButtonNo}
                                     onPress={() => setSelectedToDelete(null)}
                                 >
-                                    <Text style={{ color: '#000' }}>Hayır</Text>
+                                    <Text style={{ color: '#000' }}>No</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
