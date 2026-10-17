@@ -1,50 +1,61 @@
-# Zivo APP MOBİL ~ FRONTEND👋
+# Zivo
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Kuaför ve güzellik salonlarını keşfetmek, incelemek ve randevu almak için yazılmış mobil istemci. Bu depo uygulamanın kendisidir. Salon, kullanıcı ve randevu verisi ayrı bir API’den gelir.
 
-## Get started
+## Ne yapar
 
-1. Install dependencies
+Kullanıcı e-posta ve şifre ile kayıt olur veya giriş yapar. Oturum jetonu cihazda saklanır; uygulama açılınca oturum varsa ana sekmeler, yoksa giriş ekranı gelir.
 
-   ```bash
-   npm install
-   ```
+- **Keşfet:** salon listesi, arama ve kategori (saç, tırnak, cilt bakımı)
+- **Salon:** hizmetler, yorumlar, portföy ve salon bilgisi
+- **Randevu:** hizmet ve çalışan seçerek randevu oluşturma, düzenleme ve iptal
+- **Randevularım:** tarihe göre aktif, geçmiş ve iptal edilmiş randevular
+- **Favoriler:** kaydedilen salonlar
+- **Profil:** ad, iletişim, doğum tarihi; açık/koyu tema; Türkçe, İngilizce ve Arapça
 
-2. Start the app
+## Çalıştırma
 
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Node.js ve npm gerekir. Android için Expo Go veya bir emülatör yeter.
 
 ```bash
-npm run reset-project
+npm install
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Terminaldeki karekodu Expo Go ile okutun. Android emülatör için `a`, web için `w` tuşuna basın.
 
-## Learn more
+## API
 
-To learn more about developing your project with Expo, look at the following resources:
+İstekler `app.json` içindeki `extra.API_URL` adresine gider. Varsayılan değer Android emülatöründen bilgisayara çıkan adrestir:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```text
+http://10.0.2.2:5000
+```
 
-## Join the community
+Fiziksel telefonda bu adres çalışmaz. Aynı ağdaki bilgisayarın IP’sini yazın, örneğin `http://192.168.1.20:5000`. API ayakta değilse giriş, salon listesi ve randevu ekranları veri alamaz.
 
-Join our community of developers creating universal apps.
+Kullandığı uçlar:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+| İş | İstek |
+| --- | --- |
+| Giriş | `POST /auth/login` |
+| Kayıt | `POST /auth/register` |
+| Jeton yenileme | `POST /auth/refresh` |
+| Salonlar | `GET /businesses` |
+| Randevular | `GET /appointments/user` |
+| Randevu oluşturma | `POST /appointments` |
+| İptal | `PUT /appointments/:id/status` |
+
+## Teknolojiler
+
+React Native, Expo 53, Expo Router, TypeScript, Zustand, i18next.
+
+## Klasörler
+
+```text
+app/            Ekranlar ve yönlendirme
+src/components  Salon kartı, filtre, dil ve tema seçicileri
+src/services    API çağrıları
+src/stores      Oturum, salon, randevu ve profil durumu
+src/locales     tr, en, ar metinleri
+```
