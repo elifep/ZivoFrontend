@@ -1,7 +1,6 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { Feather, FontAwesome } from '@expo/vector-icons';
 import { useAppTheme } from '@/hooks/useAppTheme';
-import { API_URL } from '@/config/config';
 
 interface Props {
   image_url: string;
@@ -10,6 +9,7 @@ interface Props {
   liked?: boolean;
   fullWidth?: boolean;
   onToggleLike?: () => void;
+  rating?: number;
 }
 
 export default function SalonCard({
@@ -19,45 +19,54 @@ export default function SalonCard({
   liked,
   fullWidth,
   onToggleLike,
+  rating
 }: Props) {
   const { colors } = useAppTheme();
   const screenWidth = Dimensions.get('window').width;
 
+  const isLiked = liked ?? false;
+
+  const handleToggleLike = () => {
+    if (onToggleLike) {
+      onToggleLike();
+    }
+  };
+
   const cardStyle = [
     styles.card,
-    { backgroundColor: colors.card },
+    { backgroundColor: colors.cardd },
     fullWidth && { width: screenWidth - 32, marginRight: 0 },
   ];
-
-  const imageSource = image_url?.startsWith('http')
-    ? image_url
-    : `${API_URL}/${image_url}`;
 
   return (
     <View style={cardStyle}>
       <View style={styles.imageWrapper}>
-        {image_url ? (
-          <Image source={{ uri: imageSource }} style={styles.image} />
-        ) : (
-          <View style={[styles.image, styles.imageFallback]}>
-            <Text style={{ color: '#000' }}>Resim Yok</Text>
-          </View>
-        )}
+
+        <Image
+          source={
+            image_url && image_url.startsWith('http')
+              ? { uri: image_url }
+              : require('../../assets/images/salons/defaultimage.png')
+          }
+          style={styles.image}
+        />
 
         <TouchableOpacity
           style={[styles.heart, { backgroundColor: colors.background }]}
-          onPress={onToggleLike}
+          onPress={handleToggleLike}
         >
-          {liked ? (
+          {isLiked ? (
             <FontAwesome name="heart" size={18} color={colors.primary} />
           ) : (
             <Feather name="heart" size={18} color={colors.icon} />
           )}
         </TouchableOpacity>
 
-        <View style={[styles.ratingTopRight, { backgroundColor: colors.background }]}>
-          <Feather name="star" size={14} color={colors.text} />
-          <Text style={[styles.ratingText, { color: colors.text }]}>5.0</Text>
+        <View style={[styles.ratingTopRight, { backgroundColor: colors.background, borderColor: colors.border }]}>
+          <Feather name="star" size={15} color={colors.text} />
+          <Text style={[styles.ratingText, { color: colors.text }]}>
+            {rating?.toFixed(1) ?? '0.0'}
+          </Text>
         </View>
       </View>
 
@@ -77,6 +86,7 @@ const styles = StyleSheet.create({
     marginRight: 16,
     borderRadius: 12,
     overflow: 'hidden',
+    elevation: 5,
   },
   imageWrapper: {
     position: 'relative',
@@ -94,7 +104,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     left: 10,
-    padding: 6,
+    padding: 10, // artırıldı
     borderRadius: 20,
   },
   ratingTopRight: {

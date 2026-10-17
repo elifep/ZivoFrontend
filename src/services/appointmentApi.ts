@@ -4,13 +4,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const getUserAppointments = async () => {
     const token = await AsyncStorage.getItem('accessToken');
     if (!token) throw new Error('Yetki bilgisi bulunamadı.');
-    console.log('🔐 Token:', token);
     const response = await fetch(`${API_URL}/appointments/user`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     });
-    console.log('📡 Yanıt Kodu:', response.status);
     if (!response.ok) {
         throw new Error('Randevular getirilemedi');
     }

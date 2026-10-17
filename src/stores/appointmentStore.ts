@@ -26,19 +26,16 @@ export const useAppointmentStore = create<AppointmentStore>((set, get) => ({
     error: null,
 
     fetchAppointments: async () => {
-        console.log('📡 fetchAppointments çağrıldı');
         set({ loading: true, error: null });
         try {
             const data = await getUserAppointments();
-            console.log('✅ API yanıtı:', data);
             const mapped = data.map((item: any) => ({
                 ...item,
                 status: item.status as 'active' | 'cancelled',
             }));
             set({ appointments: mapped });
         } catch (error: any) {
-            console.error('❌ Randevu çekme hatası:', error.message);
-            set({ error: error.message || 'Bir hata oluştu' });
+            set({ error: error.message || 'An error occurred' });
         } finally {
             set({ loading: false });
         }

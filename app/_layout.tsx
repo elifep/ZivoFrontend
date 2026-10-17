@@ -30,6 +30,7 @@ export default function RootLayout() {
         <Stack.Screen name="SalonDetailScreen" options={{ headerShown: false, presentation: 'card' }} />
         <Stack.Screen name="RandevuScreen" options={{ headerShown: false, presentation: 'card' }} />
         <Stack.Screen name="EditAppointmentScreen" options={{ headerShown: false, presentation: 'card' }} />
+        <Stack.Screen name='MapScreen' options={{ headerShown: false, presentation: 'card' }} />
       </Stack>
       <Toast />
     </ThemeProvider>

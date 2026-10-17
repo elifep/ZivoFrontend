@@ -1,19 +1,20 @@
-import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, FlatList, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Calendar } from 'react-native-calendars';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
 import { useAppointmentStore } from '@/stores/appointmentStore';
 import { useServiceStore } from '@/stores/serviceStore';
 import { useLocalSearchParams } from 'expo-router'; // serviceId ve businessId parametreleri burada
 import { generateTimeSlots } from '@/utils/time';
 import Toast from 'react-native-toast-message';
+import { useTranslation } from 'react-i18next';
 
 export default function RandevuScreen() {
     const { create } = useAppointmentStore();
+    const { t } = useTranslation();
     const router = useRouter();
     const params = useLocalSearchParams();
     const serviceId = params.servicesId as string;
@@ -23,7 +24,7 @@ export default function RandevuScreen() {
     const [availableTimes, setAvailableTimes] = useState<string[]>([]);
     const [selectedEmployee, setSelectedEmployee] = useState<string | null>('irem');
     const [showStaffModal, setShowStaffModal] = useState(false);
-    const [selectedDate, setSelectedDate] = useState<string>('2025-06-10');
+    const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
     const [selectedTime, setSelectedTime] = useState<string>('11:30');
     const [note, setNote] = useState('');
     const { services } = useServiceStore();
@@ -84,14 +85,13 @@ export default function RandevuScreen() {
 
     return (
         <View style={{ flex: 1, backgroundColor: colors.background }}>
-            <StatusBar style={isDark ? 'light' : 'dark'} backgroundColor={colors.background} translucent={false} />
             <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
                 <ScrollView style={{ padding: 16, paddingBottom: 100, backgroundColor: colors.background }}>
 
                     {/* Geri Butonu */}
                     <TouchableOpacity onPress={() => router.back()} style={{ marginBottom: 16, flexDirection: 'row', alignItems: 'center' }}>
                         <Ionicons name="arrow-back" size={24} color={colors.text} />
-                        <Text style={{ color: colors.text }}>Randevu AL</Text>
+                        <Text style={{ color: colors.text }}>{t('appointment_create.title')}</Text>
                     </TouchableOpacity>
 
 
@@ -101,25 +101,26 @@ export default function RandevuScreen() {
                             style={[
                                 styles.farkEtmezButton,
                                 {
-                                    borderColor: selectedEmployee === null ? colors.primary : colors.softBorder,
-                                    backgroundColor: selectedEmployee === null ? colors.primary : 'transparent',
+                                    borderColor: selectedEmployee === null ? colors.primary : colors.softicon,
+                                    backgroundColor: selectedEmployee === null ? colors.primary : colors.softicon,
                                 },
                             ]}
                             onPress={() => setSelectedEmployee(null)}
                         >
                             <Text style={{
-                                color: selectedEmployee === null ? colors.buttonText : colors.text, // ✅ seçildiyse açık tema yazı rengi
+                                color: selectedEmployee === null ? colors.buttonText : colors.buttonText,
+                                shadowColor: colors.primary,
                                 fontWeight: '500'
                             }}>
-                                Fark Etmez
+                                {t('appointment_create.anyEmployee')}
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => setSelectedEmployee('irem')}>
-                            <Ionicons name="person-circle" size={50} color={selectedEmployee === 'irem' ? 'blue' : colors.icon} />
+                            <Ionicons name="person-circle" size={50} color={selectedEmployee === 'irem' ? colors.primary : colors.softicon} />
                             <Text style={[styles.employeeLabel, { color: colors.text }]}>İrem Taş</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => setSelectedEmployee('julide')}>
-                            <Ionicons name="person-circle" size={50} color={selectedEmployee === 'julide' ? 'blue' : colors.icon} />
+                            <Ionicons name="person-circle" size={50} color={selectedEmployee === 'julide' ? colors.primary : colors.softicon} />
                             <Text style={[styles.employeeLabel, { color: colors.text }]}>Jülide Aslan</Text>
                         </TouchableOpacity>
                     </View>
@@ -177,10 +178,10 @@ export default function RandevuScreen() {
 
                         <View style={styles.employeeLine}>
                             <Text style={{ color: colors.text }}>
-                                Çalışan: {selectedEmployee === null ? 'Fark Etmez' : selectedEmployee === 'julide' ? 'Jülide Aslan' : 'İrem Taş'}
+                                {t('appointment_create.selectedEmployee')}: {selectedEmployee === null ? t('appointment_create.anyEmployee') : selectedEmployee === 'julide' ? 'Jülide Aslan' : 'İrem Taş'}
                             </Text>
-                            <TouchableOpacity style={styles.editButton} onPress={() => setShowStaffModal(true)}>
-                                <Text style={{ fontSize: 12 }}>Değiştir</Text>
+                            <TouchableOpacity style={[styles.editButton, { backgroundColor: colors.primary }]} onPress={() => setShowStaffModal(true)}>
+                                <Text style={{ color: colors.buttonText, fontWeight: 'bold', fontSize: 12 }}>{t('appointment_create.change')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -188,7 +189,7 @@ export default function RandevuScreen() {
                     {/* + Hizmet Ekle */}
                     <TouchableOpacity style={styles.addService}>
                         <Ionicons name="add-outline" size={18} color={colors.text} />
-                        <Text style={{ marginLeft: 6, color: colors.text }}>Hizmet Ekle</Text>
+                        <Text style={{ marginLeft: 6, color: colors.text }}>{t('appointment_create.addService')}</Text>
                     </TouchableOpacity>
 
                     {/* Not Bırak */}
@@ -208,7 +209,7 @@ export default function RandevuScreen() {
                         }}
                     >
                         <Ionicons name="chatbubble-outline" size={16} color={colors.text} />
-                        <Text style={{ color: colors.text, marginLeft: 6 }}>Not Bırak</Text>
+                        <Text style={{ color: colors.text, marginLeft: 6 }}>{t('appointment_create.addNote')}</Text>
                     </TouchableOpacity>
 
                     {/* Not Bırak Modal */}
@@ -233,10 +234,10 @@ export default function RandevuScreen() {
                                 }}
                             >
                                 <Text style={{ color: colors.text, fontSize: 16, fontWeight: 'bold', marginBottom: 12 }}>
-                                    Not Bırak
+                                    {t('appointment_create.addNote')}
                                 </Text>
                                 <TextInput
-                                    placeholder="Örnek: Saçımı küt istiyorum"
+                                    placeholder={t('appointment_create.notePlaceholder')}
                                     placeholderTextColor="#888"
                                     value={note}
                                     onChangeText={setNote}
@@ -260,7 +261,7 @@ export default function RandevuScreen() {
                                         alignItems: 'center',
                                     }}
                                 >
-                                    <Text style={{ color: colors.background }}>Kaydet</Text>
+                                    <Text style={{ color: colors.background }}>{t('appointment_create.saveNote')}</Text>
                                 </TouchableOpacity>
                             </View>
                         </TouchableOpacity>
@@ -292,16 +293,16 @@ export default function RandevuScreen() {
                                 maxWidth: 300,
                             }}>
                                 <Text style={{ color: colors.text, fontSize: 16, fontWeight: 'bold', marginBottom: 12 }}>
-                                    Çalışan Seçin
+                                    {t('appointment_create.selectEmployee')}
                                 </Text>
 
                                 {[
-                                    { id: null, name: 'Fark Etmez' },
+                                    { id: null, name: t('appointment_create.anyEmployee') },
                                     { id: 'irem', name: 'İrem Taş' },
                                     { id: 'julide', name: 'Jülide Aslan' }
                                 ].map((staff) => (
                                     <TouchableOpacity
-                                        key={staff.id ?? 'farketmez'}
+                                        key={staff.id ?? t('appointment_create.anyEmployee')}
                                         style={{
                                             paddingVertical: 10,
                                             paddingHorizontal: 12,
@@ -327,7 +328,7 @@ export default function RandevuScreen() {
                                         alignSelf: 'flex-end',
                                     }}
                                 >
-                                    <Text style={{ color: colors.primary }}>Kapat</Text>
+                                    <Text style={{ color: colors.primary }}>{t('appointment_create.saveNote')}</Text>
                                 </TouchableOpacity>
                             </View>
                         </TouchableOpacity>
@@ -340,7 +341,7 @@ export default function RandevuScreen() {
                         </View>
                         <TouchableOpacity style={[styles.confirmButton, { backgroundColor: colors.primary }]}
                             onPress={handleConfirm}>
-                            <Text style={{ color: colors.buttonText, fontWeight: 'bold' }}>Randevuyu Onayla</Text>
+                            <Text style={{ color: colors.buttonText, fontWeight: 'bold' }}>{t('appointment_create.confirm')}</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>

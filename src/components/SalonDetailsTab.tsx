@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Platform } from 'react
 import { Ionicons, Feather, Entypo } from '@expo/vector-icons';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { Linking } from 'react-native';
-
+import { FontAwesome } from '@expo/vector-icons';
 export default function SalonDetailsTab() {
     const { colors, isDark } = useAppTheme();
     const openMap = () => {
@@ -23,7 +23,7 @@ export default function SalonDetailsTab() {
             <View style={[styles.mapBox, { backgroundColor: colors.card }]}>
                 <Image source={require('../../assets/map-snapshot.png')} style={styles.mapImage} />
                 <View style={styles.mapInfo}>
-                    <Image source={require('../../assets/images/salons/rose-life-nisantasi.jpg')} style={styles.avatar} />
+                    <Image source={require('../../assets/images/salons/defaultimage.png')} style={styles.avatar} />
                     <View style={{ flex: 1 }}>
                         <Text style={[styles.salonName, { color: colors.text }]}>Rose Life Nişantaşı</Text>
                         <Text style={[styles.salonAddress, { color: colors.text }]}>34920 Vadi İstanbul Avrupa Yakası...</Text>
@@ -35,12 +35,12 @@ export default function SalonDetailsTab() {
             </View>
 
             <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>Hakkımızda</Text>
-                <Text style={[styles.paragraph, { color: colors.text }]}>Özellikle mikroblading olmak üzere her alanda uzmanlarımızla güzelliğiniz için yanınızdayız.</Text>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>About Us</Text>
+                <Text style={[styles.paragraph, { color: colors.text }]}>Our specialists are here to enhance your beauty, especially in microblading and many more.</Text>
             </View>
 
             <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>Çalışanlar</Text>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Staff</Text>
                 <View style={styles.staffRow}>
                     <View style={styles.staffItem}>
                         <Ionicons name="person-circle-outline" size={40} color={colors.icon} />
@@ -54,14 +54,14 @@ export default function SalonDetailsTab() {
             </View>
 
             <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>İletişim & Çalışma Saatleri</Text>
-                <View style={styles.scheduleRow}><Text style={[styles.day, { color: colors.text }]}>Pazartesi</Text><Text style={[styles.time, { color: colors.text }]}>09:00 - 19:00</Text></View>
-                <View style={styles.scheduleRow}><Text style={[styles.day, { color: colors.text }]}>Salı</Text><Text style={[styles.time, { color: colors.text }]}>09:00 - 19:00</Text></View>
-                <View style={styles.scheduleRow}><Text style={[styles.day, { color: colors.text }]}>Çarşamba</Text><Text style={[styles.time, { color: colors.text }]}>09:00 - 19:00</Text></View>
-                <View style={styles.scheduleRow}><Text style={[styles.day, { color: colors.text }]}>Perşembe</Text><Text style={[styles.time, { color: colors.text }]}>09:00 - 19:00</Text></View>
-                <View style={styles.scheduleRow}><Text style={[styles.day, { color: colors.text }]}>Cuma</Text><Text style={[styles.time, { color: colors.text }]}>09:00 - 19:00</Text></View>
-                <View style={styles.scheduleRow}><Text style={[styles.day, { color: colors.text }]}>Cumartesi</Text><Text style={[styles.time, { color: colors.text }]}>Kapalıyız</Text></View>
-                <View style={styles.scheduleRow}><Text style={[styles.day, { color: colors.text }]}>Pazar</Text><Text style={[styles.time, { color: colors.text }]}>Kapalıyız</Text></View>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Contact & Working Hours</Text>
+                <View style={styles.scheduleRow}><Text style={[styles.day, { color: colors.text }]}>Monday</Text><Text style={[styles.time, { color: colors.text }]}>09:00 - 19:00</Text></View>
+                <View style={styles.scheduleRow}><Text style={[styles.day, { color: colors.text }]}>Tuesday</Text><Text style={[styles.time, { color: colors.text }]}>09:00 - 19:00</Text></View>
+                <View style={styles.scheduleRow}><Text style={[styles.day, { color: colors.text }]}>Wednesday</Text><Text style={[styles.time, { color: colors.text }]}>09:00 - 19:00</Text></View>
+                <View style={styles.scheduleRow}><Text style={[styles.day, { color: colors.text }]}>Thursday</Text><Text style={[styles.time, { color: colors.text }]}>09:00 - 19:00</Text></View>
+                <View style={styles.scheduleRow}><Text style={[styles.day, { color: colors.text }]}>Friday</Text><Text style={[styles.time, { color: colors.text }]}>09:00 - 19:00</Text></View>
+                <View style={styles.scheduleRow}><Text style={[styles.day, { color: colors.text }]}>Saturday</Text><Text style={[styles.time, { color: colors.text }]}>Closed</Text></View>
+                <View style={styles.scheduleRow}><Text style={[styles.day, { color: colors.text }]}>Sunday</Text><Text style={[styles.time, { color: colors.text }]}>Closed</Text></View>
 
                 <View style={styles.phoneRow}>
                     <Text style={[styles.phoneNumber, { color: colors.text }]}>0 (216) 444 444</Text>
@@ -69,14 +69,18 @@ export default function SalonDetailsTab() {
                         style={[styles.callButton, { backgroundColor: isDark ? '#fff' : '#000' }]}
                     >
                         <Feather name="phone-call" size={18} color={isDark ? '#000' : '#fff'} />
-                        <Text style={{ color: isDark ? '#000' : '#fff', fontSize: 13 }}>Ara</Text>
+                        <Text style={{ color: isDark ? '#000' : '#fff', fontSize: 13 }}>Call</Text>
                     </TouchableOpacity>
                 </View>
             </View>
 
             <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>Sosyal Medya</Text>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Social Media</Text>
                 <View style={styles.socialRow}>
+                <View style={styles.socialItem}>
+                <FontAwesome name="whatsapp" size={24} color={colors.icon} />
+                        <Text style={[styles.socialLabel, { color: colors.text }]}>Whatsapp</Text>
+                    </View>
                     <View style={styles.socialItem}>
                         <Feather name="instagram" size={24} color={colors.icon} />
                         <Text style={[styles.socialLabel, { color: colors.text }]}>Instagram</Text>
@@ -89,9 +93,9 @@ export default function SalonDetailsTab() {
             </View>
 
             <View style={styles.reportContainer}>
-                <Text style={[styles.reportPrompt, { color: colors.text }]}>Bir şikayetiniz mi var?</Text>
+                <Text style={[styles.reportPrompt, { color: colors.text }]}>Have a complaint?</Text>
                 <TouchableOpacity style={[styles.reportButton, { borderColor: colors.text, backgroundColor: colors.background }]}>
-                    <Text style={[styles.reportButtonText, { color: colors.text }]}>Rapor Et</Text>
+                    <Text style={[styles.reportButtonText, { color: colors.text }]}>Report</Text>
                 </TouchableOpacity>
             </View>
         </View>

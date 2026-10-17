@@ -1,11 +1,9 @@
 // src/services/authService.ts
 import { API_URL } from '@/config/config';
 
-const BASE_URL = API_URL;
-
 export const loginUser = async (email: string, password: string) => {
-    console.log(`${BASE_URL}/auth/login`)
-    const response = await fetch(`${BASE_URL}/auth/login`, {
+    console.log(`${API_URL}/auth/login`)
+    const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -22,7 +20,7 @@ export const loginUser = async (email: string, password: string) => {
 };
 
 export const registerUser = async (email: string, password: string) => {
-    const response = await fetch(`${BASE_URL}/auth/register`, {
+    const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -39,7 +37,7 @@ export const registerUser = async (email: string, password: string) => {
 };
 
 export const refreshToken = async (refreshToken: string) => {
-    const response = await fetch(`${BASE_URL}/auth/refresh`, {
+    const response = await fetch(`${API_URL}/auth/refresh`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

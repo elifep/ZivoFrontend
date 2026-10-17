@@ -4,7 +4,6 @@ import { Calendar } from 'react-native-calendars';
 import { useAppTheme } from '@/hooks/useAppTheme';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { StatusBar } from 'expo-status-bar';
 
 export default function EditAppointmentScreen() {
     const router = useRouter();
@@ -25,19 +24,17 @@ export default function EditAppointmentScreen() {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-            
+
             <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
 
                 {/* Geri Butonu */}
                 <TouchableOpacity onPress={() => router.back()} style={{ marginBottom: 16, flexDirection: 'row', alignItems: 'center' }}>
                     <Ionicons name="arrow-back" size={24} color={colors.text} />
-                    <Text style={{ color: colors.text }}>Randevularım</Text>
+                    <Text style={{ color: colors.text }}>	My Appointments</Text>
                 </TouchableOpacity>
 
-
-                {/* Çalışan Seçimi */}
                 <View style={styles.employeeRow}>
-                    <TouchableOpacity style={[styles.farkEtmezButton, { borderColor: colors.softBorder }]}><Text style={{ color: colors.text }}>Fark Etmez</Text></TouchableOpacity>
+                    <TouchableOpacity style={[styles.farkEtmezButton, { borderColor: colors.softBorder }]}><Text style={{ color: colors.text }}>Doesn't Matter</Text></TouchableOpacity>
                     <TouchableOpacity onPress={() => setSelectedEmployee('irem')}>
                         <Ionicons name="person-circle" size={50} color={selectedEmployee === 'irem' ? 'blue' : colors.icon} />
                         <Text style={[styles.employeeLabel, { color: colors.text }]}>İrem Taş</Text>
@@ -68,8 +65,6 @@ export default function EditAppointmentScreen() {
                     style={{ marginVertical: 16 }}
                 />
 
-                {/* Saat Seçimi */}
-                {/* Saatler - Scrollable */}
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingVertical: 12, paddingLeft: 16 }}>
                     {times.map((time) => (
                         <TouchableOpacity
@@ -87,7 +82,6 @@ export default function EditAppointmentScreen() {
                     ))}
                 </ScrollView>
 
-                {/* Seçilen Hizmet */}
                 <View style={[styles.serviceCard, { backgroundColor: colors.card }]}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Text style={[styles.serviceTitle, { color: colors.text }]}>Manikür</Text>
@@ -98,9 +92,9 @@ export default function EditAppointmentScreen() {
                     </View>
                     <View style={[styles.serviceLine, { backgroundColor: colors.softBorder }]} />
                     <View style={styles.employeeLine}>
-                        <Text style={{ color: colors.text }}>Çalışan: {selectedEmployee === 'julide' ? 'Jülide Aslan' : 'İrem Taş'}</Text>
+                        <Text style={{ color: colors.text }}>Staff: {selectedEmployee === 'julide' ? 'Jülide Aslan' : 'İrem Taş'}</Text>
                         <TouchableOpacity style={styles.editButton}>
-                            <Text style={{ fontSize: 12 }}>Değiştir</Text>
+                            <Text style={{ fontSize: 12 }}>Change</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -108,7 +102,7 @@ export default function EditAppointmentScreen() {
                 {/* + Hizmet Ekle */}
                 <TouchableOpacity style={styles.addService}>
                     <Ionicons name="add-outline" size={18} color={colors.text} />
-                    <Text style={{ marginLeft: 6, color: colors.text }}>Hizmet Ekle</Text>
+                    <Text style={{ marginLeft: 6, color: colors.text }}>Add Service</Text>
                 </TouchableOpacity>
 
                 {/* Not Bırak */}
@@ -128,7 +122,7 @@ export default function EditAppointmentScreen() {
                     }}
                 >
                     <Ionicons name="chatbubble-outline" size={16} color={colors.text} />
-                    <Text style={{ color: colors.text, marginLeft: 6 }}>Not Bırak</Text>
+                    <Text style={{ color: colors.text, marginLeft: 6 }}>Leave a Note</Text>
                 </TouchableOpacity>
 
                 {/* Not Bırak Modal */}
@@ -153,10 +147,10 @@ export default function EditAppointmentScreen() {
                             }}
                         >
                             <Text style={{ color: colors.text, fontSize: 16, fontWeight: 'bold', marginBottom: 12 }}>
-                                Not Bırak
+                                Leave a Note
                             </Text>
                             <TextInput
-                                placeholder="Örnek: Saçımı küt istiyorum"
+                                placeholder="Example: I want a bob cut"
                                 placeholderTextColor="#888"
                                 value={note}
                                 onChangeText={setNote}
@@ -180,7 +174,7 @@ export default function EditAppointmentScreen() {
                                     alignItems: 'center',
                                 }}
                             >
-                                <Text style={{ color: colors.background }}>Kaydet</Text>
+                                <Text style={{ color: colors.background }}>Save</Text>
                             </TouchableOpacity>
                         </View>
                     </TouchableOpacity>
@@ -190,10 +184,10 @@ export default function EditAppointmentScreen() {
                 <View style={styles.footer}>
                     <View>
                         <Text style={{ color: colors.text, fontSize: 20, fontWeight: 'bold' }}>350 ₺</Text>
-                        <Text style={{ color: colors.mutedText }}>30 dk</Text>
+                        <Text style={{ color: colors.mutedText }}>30 min</Text>
                     </View>
                     <TouchableOpacity style={[styles.confirmButton, { backgroundColor: colors.primary }]}>
-                        <Text style={{ color: colors.buttonText, fontWeight: 'bold' }}>Randevuyu Düzenle</Text>
+                        <Text style={{ color: colors.buttonText, fontWeight: 'bold' }}>Edit Appointment</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>

@@ -8,16 +8,14 @@ import { LocaleConfig } from 'react-native-calendars';
 import { useTranslation } from 'react-i18next';
 import { setupCalendarLocales } from '@/config/calendarLocales';
 import { formatDate } from '@/config/date';
-import { StatusBar } from 'expo-status-bar';
 import { format } from 'date-fns'; // en üstte
 import { useRouter } from 'expo-router';
 import { useAppointmentStore } from '@/stores/appointmentStore'; // ✅ store'u çağır
 import { useServiceStore } from '@/stores/serviceStore';
 import { useBusinessStore } from '@/stores/businessStore';
 
-
 export default function AppointmentsScreen() {
-    const { colors, isDark } = useAppTheme();
+    const { colors } = useAppTheme();
     const router = useRouter();
     const { t, i18n } = useTranslation();
     const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -30,7 +28,8 @@ export default function AppointmentsScreen() {
 
     const { services, fetchAllServices } = useServiceStore();
     const getServiceById = (id: string | null) =>
-        services.find(s => s.servicesid === id);
+        services.find(s => s.servicesid?.trim?.() === id?.trim?.());
+
 
     const { businesses, fetchBusinesses } = useBusinessStore();
     const getBusinessById = (id: string) => businesses.find(b => b.businessId === id);
@@ -45,17 +44,12 @@ export default function AppointmentsScreen() {
     );
     const [selectedToCancel, setSelectedToCancel] = useState<any>(null);
 
-
     useEffect(() => {
         const loadAllData = async () => {
             try {
+                await fetchAllServices();
                 await fetchAppointments();
-                const businessesData = await fetchBusinesses();
-
-                const firstBusinessId = businessesData?.[0]?.businessId;
-                if (firstBusinessId) {
-                    await fetchAllServices();
-                }
+                await fetchBusinesses();
             } catch (err) {
                 console.error('Veriler yüklenirken hata oluştu:', err);
             }
@@ -81,14 +75,9 @@ export default function AppointmentsScreen() {
         setTimeout(() => setCalendarReady(true), 50); // kısa bir bekleme ile yeniden render
     }, [i18n.language]);
 
-    console.log('Tüm randevular:', appointments);
-    console.log('Seçili gün:', selectedDate);
-    console.log('Filtrelenmiş randevular:', filteredAppointments);
-
     return (
         // <View style={{ flex: 1, backgroundColor: colors.background }}>
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-            <StatusBar style={isDark ? 'light' : 'dark'} backgroundColor={colors.background} translucent={false} />
 
             <Text
                 style={{
@@ -112,7 +101,7 @@ export default function AppointmentsScreen() {
                         key={i18n.language}
                         onDayPress={(day) => setSelectedDate(day.dateString)}
                         markedDates={{
-                            [selectedDate]: { selected: true, selectedColor: colors.primary },
+                            [selectedDate]: { selected: true, marked: true, selectedColor: colors.primary },
                         }}
                         theme={{
                             calendarBackground: colors.background,
@@ -188,7 +177,7 @@ export default function AppointmentsScreen() {
                                         <View style={styles.infoRow}>
                                             <Feather name="scissors" size={14} color={colors.icon} />
                                             <Text style={[styles.infoText, { color: colors.icon }]}>
-                                                {service?.name || a.servicesid}
+                                                {service?.name ?? 'unknownService'}
                                             </Text>
                                         </View>
                                         <View style={styles.infoRow}>

@@ -3,31 +3,24 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     },
-    "types": [
-      "react",
-      "react-native",
-      "expo"
-    ],
+    "types": ["react", "react-native", "expo"],
     "jsx": "react-native",
     "module": "esnext",
-    "strict": true
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
   },
   "include": [
     "src",
     "app",
+    "types",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
   ],
   "exclude": [
     "node_modules"
-  ],
-  "expo": {
-    "extra": {
-      "API_URL": "http://10.0.2.2:5000"
-    }
-  }
+  ]
 }

@@ -31,6 +31,7 @@ export default function LoginScreen() {
             });
             router.replace('/(tabs)');
         } catch (error: any) {
+            console.error('Giriş hatası:', error);
             Toast.show({
                 type: 'error',
                 text1: t('toast.loginErrorTitle'),
